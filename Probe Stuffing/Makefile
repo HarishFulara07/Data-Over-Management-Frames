@@ -12,3 +12,4 @@ all: $(OBJ)
 
 clean:
 	rm -f probe_stuffing
+	rm -f *.o
