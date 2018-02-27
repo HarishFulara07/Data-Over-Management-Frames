@@ -12,13 +12,9 @@ sudo apt-get install libnl-genl-3-dev
 
 Build with: `make`
 
-Run with: `sudo ./probe_stuffing <Network Interface> <Vendor Tag Number> <Vendor OUI> <Data>`
+Run with: `sudo ./probe_stuffing <Network Interface> <Data>`
 
 `<Network Interface>` The network interface to use for sending scan request. Data is stuffed inside the probe request packets sent during the scan request.
-
-`<Ventor Tag Number>` Any number between 0 and 255
-
-`<Vendor OUI>` Any 3 digit number
 
 `<Data>` The data to stuff inside the probe request packet. The data can be max 252 characters long. 
 
