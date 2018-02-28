@@ -1,4 +1,4 @@
-# Wifi-Over-Management-Frames
+# Wifi Over Management Frames - Probe Stuffing
 
 ## Pre-Requisite
 [libnl](https://www.infradead.org/~tgr/libnl/) is required to run the code. To install libnl, run the following command in your terminal:
