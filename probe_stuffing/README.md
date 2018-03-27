@@ -16,9 +16,9 @@ Run with: `sudo ./probe_stuffing -i <Network Interface> -n <Number of IEs> -d <D
 
 `<Network Interface>` The network interface to use for sending scan request. Data is stuffed inside the probe request packets sent during the scan request.
 
-`<Number of IEs>` The number of IEs to stuff. 
+`<Number of IEs>` The number of IEs to send. 
 
-`<Data>` The data to stuff inside the probe request packet. The data can be max 252 characters long. 
+`<Data>` The data to stuff inside the IEs. The data can be max 252 characters long. 
 
 Example: `sudo ./probe_stuffing -i wlan0 -n 3 -d "IE Data 1" -d "IE Data 2" -d "IE Data 3"` 
 
