@@ -12,11 +12,15 @@ sudo apt-get install libnl-genl-3-dev
 
 Build with: `make`
 
-Run with: `sudo ./probe_stuffing <Network Interface> <Data>`
+Run with: `sudo ./probe_stuffing -i <Network Interface> -n <Number of IEs> -d <Data 1> -d <Data 2> ... -d <Data n>`
 
 `<Network Interface>` The network interface to use for sending scan request. Data is stuffed inside the probe request packets sent during the scan request.
 
+`<Number of IEs>` The numeber of IEs to stuff. 
+
 `<Data>` The data to stuff inside the probe request packet. The data can be max 252 characters long. 
+
+Example: `sudo ./probe_stuffing -i wlan0 -n 3 -d "IE Data 1" -d "IE Data 2" -d "IE Data 3"` 
 
 ## Resources:
 [1] http://git.kernel.org/cgit/linux/kernel/git/jberg/iw.git/tree/scan.c
