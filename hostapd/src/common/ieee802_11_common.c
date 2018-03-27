@@ -168,8 +168,9 @@ static int ieee802_11_parse_vendor_specific(const u8 *pos, size_t elen,
 		break;
 
 	case OUI_PROBE_STUFFING:
-		elems->stuffed_data = pos;
-		elems->stuffed_data_len = elen;
+		elems->stuffed_data[elems->n_stuffed_ies] = pos;
+		elems->stuffed_data_len[elems->n_stuffed_ies] = elen;
+		elems->n_stuffed_ies++;
 	default:
 		wpa_printf(MSG_EXCESSIVE, "unknown vendor specific "
 			   "information element ignored (vendor OUI "
@@ -199,6 +200,7 @@ ParseRes ieee802_11_parse_elems(const u8 *start, size_t len,
 	int unknown = 0;
 
 	os_memset(elems, 0, sizeof(*elems));
+	elems->n_stuffed_ies = 0;
 
 	while (left >= 2) {
 		u8 id, elen;

@@ -64,7 +64,7 @@ struct ieee802_11_elems {
 	const u8 *pref_freq_list;
 	const u8 *supp_op_classes;
 	const u8 *rrm_enabled;
-	const u8 *stuffed_data;
+	const u8 *stuffed_data[10];
 
 	u8 ssid_len;
 	u8 supp_rates_len;
@@ -97,7 +97,8 @@ struct ieee802_11_elems {
 	u8 pref_freq_list_len;
 	u8 supp_op_classes_len;
 	u8 rrm_enabled_len;
-	u8 stuffed_data_len;
+	u8 n_stuffed_ies;
+	u8 stuffed_data_len[10];
 
 	struct mb_ies_info mb_ies;
 };

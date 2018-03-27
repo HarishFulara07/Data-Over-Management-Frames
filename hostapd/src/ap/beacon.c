@@ -730,13 +730,16 @@ void handle_probe_req(struct hostapd_data *hapd,
 		return;
 	} else {
 		// Receive the data stuffed by the client inside probe packets.
-		if (elems.stuffed_data_len > 0) {
-			char *ie_stuffed_data = malloc(elems.stuffed_data_len - 2);
-			char *stuffed_data = (char *)elems.stuffed_data;
-			memcpy(ie_stuffed_data, stuffed_data + 3, elems.stuffed_data_len - 3);
-			ie_stuffed_data[elems.stuffed_data_len - 3] = '\0';
-			// For now, just printing the data stuffed by the client on the console.
-			printf("Stuffed Data: %s\n\n", ie_stuffed_data);
+		if (elems.n_stuffed_ies > 0) {
+			for (int i = 0; i < elems.n_stuffed_ies; ++i) {
+				char *ie_stuffed_data = malloc(elems.stuffed_data_len[i] - 2);
+				char *stuffed_data = (char *)elems.stuffed_data[i];
+				memcpy(ie_stuffed_data, stuffed_data + 3, elems.stuffed_data_len[i] - 3);
+				ie_stuffed_data[elems.stuffed_data_len[i] - 3] = '\0';
+				// For now, just printing the data stuffed by the client on the console.
+				printf("Stuffed Data: %s\n\n", ie_stuffed_data);
+				free(ie_stuffed_data);
+			}
 		}
 	}
 
