@@ -16,7 +16,7 @@ Run with: `sudo ./probe_stuffing -i <Network Interface> -n <Number of IEs> -d <D
 
 `<Network Interface>` The network interface to use for sending scan request. Data is stuffed inside the probe request packets sent during the scan request.
 
-`<Number of IEs>` The number of IEs to send. 
+`<Number of IEs>` The number of IEs to send (should be max 10).  Note: hostapd code can handle max 10 stuffed IEs.
 
 `<Data>` The data to stuff inside the IEs. The data can be max 252 characters long. 
 
