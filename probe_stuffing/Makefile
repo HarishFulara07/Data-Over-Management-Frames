@@ -8,7 +8,7 @@ LIBNL = $(shell pkg-config --cflags --libs libnl-genl-3.0)
 	$(CC) -c -o $@ $< $(CFLAGS) $(LIBNL)
 
 all: $(OBJ)
-	$(CC) -o probe_stuffing $^ $(LIBNL)
+	$(CC) -g -o probe_stuffing $^ $(LIBNL)
 
 clean:
 	rm -f probe_stuffing

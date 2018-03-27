@@ -4,13 +4,17 @@
 /*
  * Include libraries.
  */
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
+#include <linux/nl80211.h>
 #include <netlink/errno.h>
-#include <netlink/netlink.h>
 #include <netlink/genl/genl.h>
 #include <linux/nl80211.h>
+#include <time.h>
+#include <netlink/netlink.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 /*
  * Define structures to be used in the code.
@@ -51,7 +55,7 @@ int nl_get_multicast_id(struct nl_sock *, const char *, const char *);
 struct ie_info * create_vendor_ie(char *);
 
 // Probe stuffing fuction.
-int do_probe_stuffing(struct nl_sock *, int, int, struct ie_info *);
+int do_probe_stuffing(struct nl_sock *, int, int, int, unsigned char *);
 
 // Main function.
 int if_nametoindex(char *);

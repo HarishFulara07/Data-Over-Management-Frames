@@ -10,8 +10,8 @@
  * It starts the scan and stuffs data as vendor 
  * specific IEs inside probe request packets.
  */
-int do_probe_stuffing(struct nl_sock *socket,
-        int interface_index, int driver_id, struct ie_info *ie) {
+int do_probe_stuffing(struct nl_sock *socket, int interface_index,
+        int driver_id, int ies_len, unsigned char *ies_data) {
     struct trigger_results results = {
         .done = 0,
         .aborted = 0
@@ -55,14 +55,13 @@ int do_probe_stuffing(struct nl_sock *socket,
     genlmsg_put(msg, 0, 0, driver_id, 0, 0, NL80211_CMD_TRIGGER_SCAN, 0);
     // Add message attribute, which interface to use.
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, interface_index);
-    // Insert the IE.
-    nla_put(msg, NL80211_ATTR_IE, ie->ie_len, ie->ie_data);
+    // Stuff IEs.
+    nla_put(msg, NL80211_ATTR_IE, ies_len, ies_data);
     // Scan all SSIDs.
     nla_put(ssids_to_scan, 1, 0, "");
     // Add message attribute, which SSIDs to scan for.
     nla_put_nested(msg, NL80211_ATTR_SCAN_SSIDS, ssids_to_scan);
 
-    free(ie);
     nlmsg_free(ssids_to_scan);
 
     // Add the callback.
@@ -92,6 +91,7 @@ int do_probe_stuffing(struct nl_sock *socket,
 
     if (ret < 0)
         printf("ERROR: nl_recvmsgs() returned %d (%s).\n", ret, nl_geterror(-ret));
+        nl_geterror(-ret);
         return ret;
 
     while (!results.done)
@@ -104,6 +104,7 @@ int do_probe_stuffing(struct nl_sock *socket,
     }
 
     // Cleanup.
+    free(ies_data);
     nlmsg_free(msg);
     nl_cb_put(cb);
     nl_socket_drop_membership(socket, mcid);
