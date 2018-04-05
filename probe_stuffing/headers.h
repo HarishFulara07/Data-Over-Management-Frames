@@ -8,7 +8,6 @@
 #include <linux/nl80211.h>
 #include <netlink/errno.h>
 #include <netlink/genl/genl.h>
-#include <linux/nl80211.h>
 #include <time.h>
 #include <netlink/netlink.h>
 #include <stdio.h>
@@ -53,6 +52,7 @@ int callback_trigger(struct nl_msg *, void *);
 // Utility functions.
 int nl_get_multicast_id(struct nl_sock *, const char *, const char *);
 struct ie_info * create_vendor_ie(char *);
+int get_ack(struct nl_msg *, void *);
 
 // Probe stuffing fuction.
 int do_probe_stuffing(struct nl_sock *, int, int, int, unsigned char *);

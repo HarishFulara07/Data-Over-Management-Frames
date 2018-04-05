@@ -76,10 +76,8 @@ int callback_trigger(struct nl_msg *msg, void *arg) {
         results->done = 1;
         results->aborted = 1;
     } else if (gnlh->cmd == NL80211_CMD_NEW_SCAN_RESULTS) {
-        //printf("Got NL80211_CMD_NEW_SCAN_RESULTS.\n");
         results->done = 1;
         results->aborted = 0;
-    }  // else probably an uninteresting multicast message.
-
+    }
     return NL_SKIP;
 }

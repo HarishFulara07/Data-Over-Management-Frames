@@ -387,6 +387,9 @@ static u8 * hostapd_gen_probe_resp(struct hostapd_data *hapd,
 #endif /* CONFIG_FST */
 	if (hapd->conf->vendor_elements)
 		buflen += wpabuf_len(hapd->conf->vendor_elements);
+	if (hapd->conf->probe_resp_ack_ie) {
+		buflen += wpabuf_len(hapd->conf->probe_resp_ack_ie);
+	}
 	if (hapd->conf->vendor_vht) {
 		buflen += 5 + 2 + sizeof(struct ieee80211_vht_capabilities) +
 			2 + sizeof(struct ieee80211_vht_operation);
@@ -531,6 +534,15 @@ static u8 * hostapd_gen_probe_resp(struct hostapd_data *hapd,
 		os_memcpy(pos, wpabuf_head(hapd->conf->vendor_elements),
 			  wpabuf_len(hapd->conf->vendor_elements));
 		pos += wpabuf_len(hapd->conf->vendor_elements);
+	}
+
+	if (hapd->conf->probe_resp_ack_ie) {
+		os_memcpy(pos, wpabuf_head(hapd->conf->probe_resp_ack_ie),
+			  wpabuf_len(hapd->conf->probe_resp_ack_ie));
+		pos += wpabuf_len(hapd->conf->probe_resp_ack_ie);
+		wpabuf_free(hapd->conf->probe_resp_ack_ie);
+		hapd->conf->probe_resp_ack_ie = NULL;
+		printf("ACK sent in PROBE RESPONSE.\n");
 	}
 
 	*resp_len = pos - (u8 *) resp;
@@ -740,6 +752,27 @@ void handle_probe_req(struct hostapd_data *hapd,
 				printf("Stuffed Data: %s\n\n", ie_stuffed_data);
 				free(ie_stuffed_data);
 			}
+			// Create an IE containing ACK.
+			// This IE will be stuffed inside he probe response frame.
+			u8 *ie_ack = (unsigned char *)malloc(10);
+			size_t ie_ack_len = 10;
+
+			// Vendor tag number.
+			ie_ack[0] = 221;
+			// Size of IE.
+			ie_ack[1] = ie_ack_len - 2;
+			// Vendor OUI (= 123). This is also a random value.
+			ie_ack[2] = 1;
+			ie_ack[3] = 2;
+			ie_ack[4] = 3;
+			ie_ack[5] = 'A';
+			ie_ack[6] = 'c';
+			ie_ack[7] = 'k';
+			ie_ack[8] = 'n';
+			ie_ack[9] = 'o';
+
+			hapd->conf->probe_resp_ack_ie = wpabuf_alloc(ie_ack_len);
+			wpabuf_put_data(hapd->conf->probe_resp_ack_ie, ie_ack, ie_ack_len);
 		}
 	}
 

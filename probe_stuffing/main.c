@@ -75,6 +75,27 @@ int main(int argc, char **argv) {
         return err;
     }
 
+    /*
+     * Now get ACK for the stuffed probe request frames.
+     */
+
+    struct nl_msg *msg = nlmsg_alloc();
+    // Run NL80211_CMD_GET_SCAN command.
+    genlmsg_put(msg, 0, 0, driver_id, 0, NLM_F_DUMP, NL80211_CMD_GET_SCAN, 0);
+    // Interface on which we scanned. Scan results will available on this interface only.
+    nla_put_u32(msg, NL80211_ATTR_IFINDEX, interface_index);
+    // Callbacks.
+    nl_socket_modify_cb(socket, NL_CB_VALID, NL_CB_CUSTOM, get_ack, NULL);
+
+    int ret = nl_send_auto(socket, msg);
+    ret = nl_recvmsgs_default(socket);
+    nlmsg_free(msg);
+
+    if (ret < 0) {
+        printf("ERROR: nl_recvmsgs_default() returned %d (%s).\n", ret, nl_geterror(-ret));
+        return ret;
+    }
+
     // int success = 0;
     // struct timeval t1, t2;
 

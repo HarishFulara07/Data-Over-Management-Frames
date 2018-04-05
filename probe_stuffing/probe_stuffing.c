@@ -14,7 +14,7 @@ int do_probe_stuffing(struct nl_sock *socket, int interface_index,
         int driver_id, int ies_len, unsigned char *ies_data) {
     struct trigger_results results = {
         .done = 0,
-        .aborted = 0
+        .aborted = 0,
     };
     struct nl_msg *msg;
     struct nl_cb *cb;
@@ -80,7 +80,7 @@ int do_probe_stuffing(struct nl_sock *socket, int interface_index,
     ret = nl_send_auto(socket, msg);
 
     printf("NL80211_CMD_TRIGGER_SCAN sent %d bytes to the kernel.\n", ret);
-    printf("Braodcasting stuffed probe request frames...\n");
+    printf("Broadcasting stuffed probe request frames.\n");
 
     while (err > 0)
         // First wait for ack_handler(). This helps with basic errors.

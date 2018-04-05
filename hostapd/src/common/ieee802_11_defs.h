@@ -978,6 +978,7 @@ struct ieee80211_ampe_ie {
 // Our custom vendor's OUI. This OUI is used by the client while
 // stuffing data inside probe packets.
 #define OUI_PROBE_STUFFING 0x010203
+#define PROBE_STUFFING_OUI_TYPE 72
 
 /*
  * WMM Information Element (used in (Re)Association Request frames; may also be

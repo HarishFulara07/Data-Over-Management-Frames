@@ -463,7 +463,7 @@ struct wpabuf * ieee802_11_vendor_ie_concat(const u8 *ies, size_t ies_len,
 		if (2 + pos[1] > end - pos)
 			break;
 		if (pos[0] == WLAN_EID_VENDOR_SPECIFIC && pos[1] >= 4 &&
-		    WPA_GET_BE32(&pos[2]) == oui_type)
+			WPA_GET_BE32(&pos[2]) == oui_type)
 			wpabuf_put_data(buf, pos + 6, pos[1] - 4);
 		pos += 2 + pos[1];
 	}
