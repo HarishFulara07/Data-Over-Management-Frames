@@ -743,19 +743,35 @@ void handle_probe_req(struct hostapd_data *hapd,
 	} else {
 		// Receive the data stuffed by the client inside probe packets.
 		if (elems.n_stuffed_ies > 0) {
-			for (int i = 0; i < elems.n_stuffed_ies; ++i) {
+			int ies_len = 0;
+
+			for (int i = 1; i < elems.n_stuffed_ies; ++i) {
 				char *ie_stuffed_data = malloc(elems.stuffed_data_len[i] - 2);
 				char *stuffed_data = (char *)elems.stuffed_data[i];
 				memcpy(ie_stuffed_data, stuffed_data + 3, elems.stuffed_data_len[i] - 3);
 				ie_stuffed_data[elems.stuffed_data_len[i] - 3] = '\0';
+				ies_len += elems.stuffed_data_len[i] + 3;
 				// For now, just printing the data stuffed by the client on the console.
 				printf("Stuffed Data: %s\n\n", ie_stuffed_data);
 				free(ie_stuffed_data);
 			}
+
+			// The first stuffed IE contains the sequence number.
+			char *seq_ie_stuffed_data = malloc(elems.stuffed_data_len[0] - 2);
+			char *seq_stuffed_data = (char *)elems.stuffed_data[0];
+			memcpy(seq_ie_stuffed_data, seq_stuffed_data + 3, elems.stuffed_data_len[0] - 3);
+			seq_ie_stuffed_data[elems.stuffed_data_len[0] - 3] = '\0';
+
+			printf("Seq number of received stuffed probe request frame is %s\n", seq_ie_stuffed_data);
+
+			int ack_seq_num = atoi(seq_ie_stuffed_data) + ies_len + 1;
+			char ack_seq_num_str[17];
+        	sprintf(ack_seq_num_str, "%d", ack_seq_num);
+
 			// Create an IE containing ACK.
 			// This IE will be stuffed inside he probe response frame.
-			u8 *ie_ack = (unsigned char *)malloc(10);
-			size_t ie_ack_len = 10;
+			size_t ie_ack_len = strlen(ack_seq_num_str) + 5;
+			u8 *ie_ack = (unsigned char *)malloc(ie_ack_len);
 
 			// Vendor tag number.
 			ie_ack[0] = 221;
@@ -765,14 +781,16 @@ void handle_probe_req(struct hostapd_data *hapd,
 			ie_ack[2] = 1;
 			ie_ack[3] = 2;
 			ie_ack[4] = 3;
-			ie_ack[5] = 'A';
-			ie_ack[6] = 'c';
-			ie_ack[7] = 'k';
-			ie_ack[8] = 'n';
-			ie_ack[9] = 'o';
+
+			int j = 0;
+			for (int i = 5; i < ie_ack_len; ++i) {
+				ie_ack[i] = ack_seq_num_str[j];
+				++j;
+			}
 
 			hapd->conf->probe_resp_ack_ie = wpabuf_alloc(ie_ack_len);
 			wpabuf_put_data(hapd->conf->probe_resp_ack_ie, ie_ack, ie_ack_len);
+			free(seq_ie_stuffed_data);
 		}
 	}
 

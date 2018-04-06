@@ -104,7 +104,6 @@ int do_probe_stuffing(struct nl_sock *socket, int interface_index,
     }
 
     // Cleanup.
-    free(ies_data);
     nlmsg_free(msg);
     nl_cb_put(cb);
     nl_socket_drop_membership(socket, mcid);

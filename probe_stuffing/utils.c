@@ -4,6 +4,23 @@
 
 #include "headers.h"
 
+// Intialize the netlink socket.
+struct nl_sock * init_socket() {
+    /*
+     * Open socket to kernel.
+     */
+
+    // Allocate new netlink socket in memory.
+    struct nl_sock *socket = nl_socket_alloc();
+    // Create file descriptor and bind socket.
+    genl_connect(socket);
+    // Set socket as a non-blocking socket.
+    nl_socket_set_nonblocking(socket);
+    // Find the nl80211 driver ID.
+
+    return socket;
+}
+
 // Source: http://sourcecodebrowser.com/iw/0.9.14/genl_8c.html.
 int nl_get_multicast_id(struct nl_sock *sock,
         const char *family, const char *group) {
@@ -84,9 +101,9 @@ void extract_ack_from_vendor_ie(unsigned char len, unsigned char *data) {
     unsigned char ps_oui[3] = {0x01, 0x02, 0x03};   // 123
 
     if (len >= 4 && memcmp(data, ps_oui, 3) == 0) {
-        printf("\tACK:");
+        printf("Received ACK: ");
         for(int i = 0; i < len - 3; i++)
-            printf(" %c", data[i + 3]);
+            printf("%c", data[i + 3]);
         printf("\n");
     }
 

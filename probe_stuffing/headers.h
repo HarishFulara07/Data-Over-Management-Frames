@@ -8,11 +8,8 @@
 #include <linux/nl80211.h>
 #include <netlink/errno.h>
 #include <netlink/genl/genl.h>
-#include <time.h>
 #include <netlink/netlink.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 /*
@@ -50,6 +47,7 @@ int family_handler(struct nl_msg *, void *);
 int callback_trigger(struct nl_msg *, void *);
 
 // Utility functions.
+struct nl_sock * init_socket();
 int nl_get_multicast_id(struct nl_sock *, const char *, const char *);
 struct ie_info * create_vendor_ie(char *);
 int get_ack(struct nl_msg *, void *);
