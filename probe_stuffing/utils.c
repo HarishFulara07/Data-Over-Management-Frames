@@ -96,18 +96,22 @@ struct ie_info * create_vendor_ie(char *data) {
 }
 
 // Extract ack from Vendor IE inside probe response frame.
-void extract_ack_from_vendor_ie(unsigned char len, unsigned char *data) {
+char * extract_ack_from_vendor_ie(unsigned char len, unsigned char *data) {
     // OUI of our vendor.
     unsigned char ps_oui[3] = {0x01, 0x02, 0x03};   // 123
+    char *ack_seq_num = (char *)malloc((len - 2) * sizeof(char));
 
     if (len >= 4 && memcmp(data, ps_oui, 3) == 0) {
-        printf("Received ACK: ");
-        for(int i = 0; i < len - 3; i++)
-            printf("%c", data[i + 3]);
-        printf("\n");
+        int j = 0;
+        for (int i = 0; i < len - 3; i++) {
+            ack_seq_num[j] = data[i + 3];
+            j++;
+        }
+        ack_seq_num[j] = '\0';
+        return ack_seq_num;
     }
 
-    return;
+    return NULL;
 }
 
 // Get ACK for sent stuffed probe request frames.
@@ -158,7 +162,12 @@ int get_ack(struct nl_msg *msg, void *arg) {
         while (ies_len >= 2 && ies_len >= ies[1]) {
             // Vendor Specific IE.
             if (ies[0] == 221) {
-                extract_ack_from_vendor_ie(ies[1], ies + 2);
+                char *ack_seq_num_str = extract_ack_from_vendor_ie(ies[1], ies + 2);
+                int *ack_seq_num = arg;
+                if (ack_seq_num_str) {
+                    *ack_seq_num = atoi(ack_seq_num_str);
+                    free(ack_seq_num_str);
+                }
             }
             ies_len -= ies[1] + 2;
             ies += ies[1] + 2;

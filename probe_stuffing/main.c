@@ -37,7 +37,8 @@ int main(int argc, char **argv) {
     int interface_index = if_nametoindex(wifi_interface);
     int driver_id;
     struct nl_sock *socket = NULL;
-    int seq_num = -1;
+    int seq_num = 0;
+    int ack_seq_num = -1;
     int scan_retries_left = 4;
     int ack_retries_left = 4;
 
@@ -97,8 +98,8 @@ int main(int argc, char **argv) {
                 } else
                     break;
             } else {  // Scanning done.
-                free(ies_data);
                 scan_retries_left = 3;
+                // sleep(1);
 
                 /*
                  * Now get ACK for the stuffed probe request frames.
@@ -110,7 +111,7 @@ int main(int argc, char **argv) {
                 // Interface on which we scanned. Scan results will available on this interface only.
                 nla_put_u32(msg, NL80211_ATTR_IFINDEX, interface_index);
                 // Callbacks.
-                nl_socket_modify_cb(socket, NL_CB_VALID, NL_CB_CUSTOM, get_ack, NULL);
+                nl_socket_modify_cb(socket, NL_CB_VALID, NL_CB_CUSTOM, get_ack, &ack_seq_num);
 
                 int ret = nl_send_auto(socket, msg);
                 ret = nl_recvmsgs_default(socket);
@@ -123,16 +124,35 @@ int main(int argc, char **argv) {
                     if (ack_retries_left > 0) {
                         nl_socket_free(socket);
                         // Wait for 15 seconds before sending new scan request.
-                        printf("%d retries left. Will retry after 10s.\n", ack_retries_left);
+                        printf("%d retries left. Will retry after 15s.\n", ack_retries_left);
                         sleep(15);
                         socket = init_socket();
                     } else
                         break;
                 } else {  // Received an ACK.
                     printf("Expected ACK: %d\n", seq_num + 1);
-                    // TODO - Ack checking.
-                    ack_retries_left = 3;
-                    break;
+                    printf("Received ACK: %d\n", ack_seq_num);
+                    // Invalid ACK. Retry.
+                    if (ack_seq_num == -1 || ack_seq_num != seq_num + 1) {
+                        ack_retries_left--;
+                        printf("Invalid received ACK.\n");
+                        
+                        if (ack_retries_left > 0) {
+                            nl_socket_free(socket);
+                            // Wait for 15 seconds before sending new scan request.
+                            printf("%d retries left. Will retry after 15s.\n", ack_retries_left);
+                            sleep(15);
+                            socket = init_socket();
+                        } else
+                            break;
+                    } else {  // Everything went well. Scan and ACK flow completed.
+                        printf("ACK received successfully.\n\nWaiting for 15s before sending more data.");
+                        fflush(stdout);
+                        // seq_num += ack_seq_num;
+                        free(ies_data);
+                        ack_retries_left = 3;
+                        break;
+                    }
                 }
             }
         }
@@ -145,7 +165,8 @@ int main(int argc, char **argv) {
             break;
         } else { // Everything went well :)
             // Sleep for 10 seconds before sending more data.
-            sleep(10);
+            printf("\nGoing to sleep for 15s before sending new scan request.\n");
+            sleep(15);
         }
 
         nl_socket_free(socket);

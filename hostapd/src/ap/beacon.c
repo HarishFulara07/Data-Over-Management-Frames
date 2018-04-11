@@ -34,6 +34,8 @@
 
 #ifdef NEED_AP_MLME
 
+int last_recv_seq_num = 0;
+
 static u8 * hostapd_eid_rm_enabled_capab(struct hostapd_data *hapd, u8 *eid,
 					 size_t len)
 {
@@ -743,6 +745,7 @@ void handle_probe_req(struct hostapd_data *hapd,
 	} else {
 		// Receive the data stuffed by the client inside probe packets.
 		if (elems.n_stuffed_ies > 0) {
+			printf("\n\nRECEIVED NEW SCAN RESULTS\n\n");
 			int ies_len = 0;
 
 			for (int i = 1; i < elems.n_stuffed_ies; ++i) {
@@ -762,35 +765,42 @@ void handle_probe_req(struct hostapd_data *hapd,
 			memcpy(seq_ie_stuffed_data, seq_stuffed_data + 3, elems.stuffed_data_len[0] - 3);
 			seq_ie_stuffed_data[elems.stuffed_data_len[0] - 3] = '\0';
 
-			printf("Seq number of received stuffed probe request frame is %s\n", seq_ie_stuffed_data);
+			printf("Hello%d\n", atoi(seq_ie_stuffed_data));
+	        printf("World%d\n", last_recv_seq_num);
 
-			int ack_seq_num = atoi(seq_ie_stuffed_data) + ies_len + 1;
-			char ack_seq_num_str[17];
-        	sprintf(ack_seq_num_str, "%d", ack_seq_num);
+			// if (atoi(seq_ie_stuffed_data) > last_recv_seq_num) {
+				printf("Seq number of received stuffed probe request frame is %s\n", seq_ie_stuffed_data);
+				int ack_seq_num = atoi(seq_ie_stuffed_data) + ies_len;
+				printf("%d\n", ack_seq_num);
+				char ack_seq_num_str[17];
+	        	sprintf(ack_seq_num_str, "%d", ack_seq_num);
 
-			// Create an IE containing ACK.
-			// This IE will be stuffed inside he probe response frame.
-			size_t ie_ack_len = strlen(ack_seq_num_str) + 5;
-			u8 *ie_ack = (unsigned char *)malloc(ie_ack_len);
+				// Create an IE containing ACK.
+				// This IE will be stuffed inside he probe response frame.
+				size_t ie_ack_len = strlen(ack_seq_num_str) + 5;
+				u8 *ie_ack = (unsigned char *)malloc(ie_ack_len);
 
-			// Vendor tag number.
-			ie_ack[0] = 221;
-			// Size of IE.
-			ie_ack[1] = ie_ack_len - 2;
-			// Vendor OUI (= 123). This is also a random value.
-			ie_ack[2] = 1;
-			ie_ack[3] = 2;
-			ie_ack[4] = 3;
+				// Vendor tag number.
+				ie_ack[0] = 221;
+				// Size of IE.
+				ie_ack[1] = ie_ack_len - 2;
+				// Vendor OUI (= 123). This is also a random value.
+				ie_ack[2] = 1;
+				ie_ack[3] = 2;
+				ie_ack[4] = 3;
 
-			int j = 0;
-			for (int i = 5; i < ie_ack_len; ++i) {
-				ie_ack[i] = ack_seq_num_str[j];
-				++j;
-			}
+				int j = 0;
+				for (int i = 5; i < ie_ack_len; ++i) {
+					ie_ack[i] = ack_seq_num_str[j];
+					++j;
+				}
 
-			hapd->conf->probe_resp_ack_ie = wpabuf_alloc(ie_ack_len);
-			wpabuf_put_data(hapd->conf->probe_resp_ack_ie, ie_ack, ie_ack_len);
-			free(seq_ie_stuffed_data);
+				hapd->conf->probe_resp_ack_ie = wpabuf_alloc(ie_ack_len);
+				wpabuf_put_data(hapd->conf->probe_resp_ack_ie, ie_ack, ie_ack_len);
+				free(seq_ie_stuffed_data);
+
+				last_recv_seq_num = ack_seq_num;
+			// }
 		}
 	}
 

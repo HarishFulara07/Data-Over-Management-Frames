@@ -79,7 +79,7 @@ int do_probe_stuffing(struct nl_sock *socket, int interface_index,
     err = 1;
     ret = nl_send_auto(socket, msg);
 
-    printf("NL80211_CMD_TRIGGER_SCAN sent %d bytes to the kernel.\n", ret);
+    printf("\nNL80211_CMD_TRIGGER_SCAN sent %d bytes to the kernel.\n", ret);
     printf("Broadcasting stuffed probe request frames.\n");
 
     while (err > 0)

@@ -100,6 +100,8 @@ struct ieee802_11_elems {
 	u8 n_stuffed_ies;
 	u8 stuffed_data_len[10];
 
+	u8 last_recv_seq_num;
+
 	struct mb_ies_info mb_ies;
 };
 
