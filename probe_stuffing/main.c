@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     int interface_index = if_nametoindex(wifi_interface);
     int driver_id;
     struct nl_sock *socket = NULL;
-    int seq_num = 0;
+    int seq_num = -1;
     int ack_seq_num = -1;
     int scan_retries_left = 4;
     int ack_retries_left = 4;
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
             ies_len += ies[i]->ie_len;
         }
 
-        seq_num += ies_len;
+        seq_num += ies_len - n_ies * 5;
 
         unsigned char *ies_data = (unsigned char *)malloc(ies_len);
         int k = 0;

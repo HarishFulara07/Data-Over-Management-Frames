@@ -745,7 +745,6 @@ void handle_probe_req(struct hostapd_data *hapd,
 	} else {
 		// Receive the data stuffed by the client inside probe packets.
 		if (elems.n_stuffed_ies > 0) {
-			printf("\n\nRECEIVED NEW SCAN RESULTS\n\n");
 			int ies_len = 0;
 
 			for (int i = 1; i < elems.n_stuffed_ies; ++i) {
@@ -753,7 +752,7 @@ void handle_probe_req(struct hostapd_data *hapd,
 				char *stuffed_data = (char *)elems.stuffed_data[i];
 				memcpy(ie_stuffed_data, stuffed_data + 3, elems.stuffed_data_len[i] - 3);
 				ie_stuffed_data[elems.stuffed_data_len[i] - 3] = '\0';
-				ies_len += elems.stuffed_data_len[i] + 3;
+				ies_len += elems.stuffed_data_len[i] - 3;
 				// For now, just printing the data stuffed by the client on the console.
 				printf("Stuffed Data: %s\n\n", ie_stuffed_data);
 				free(ie_stuffed_data);
@@ -765,13 +764,13 @@ void handle_probe_req(struct hostapd_data *hapd,
 			memcpy(seq_ie_stuffed_data, seq_stuffed_data + 3, elems.stuffed_data_len[0] - 3);
 			seq_ie_stuffed_data[elems.stuffed_data_len[0] - 3] = '\0';
 
-			printf("Hello%d\n", atoi(seq_ie_stuffed_data));
-	        printf("World%d\n", last_recv_seq_num);
+			// printf("Hello%d\n", atoi(seq_ie_stuffed_data));
+	  //       printf("World%d\n", last_recv_seq_num);
 
 			// if (atoi(seq_ie_stuffed_data) > last_recv_seq_num) {
 				printf("Seq number of received stuffed probe request frame is %s\n", seq_ie_stuffed_data);
-				int ack_seq_num = atoi(seq_ie_stuffed_data) + ies_len;
-				printf("%d\n", ack_seq_num);
+				int ack_seq_num = atoi(seq_ie_stuffed_data) + ies_len + 1;
+				printf("ACK sent: %d\n", ack_seq_num);
 				char ack_seq_num_str[17];
 	        	sprintf(ack_seq_num_str, "%d", ack_seq_num);
 
