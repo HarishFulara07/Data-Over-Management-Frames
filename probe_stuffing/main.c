@@ -37,13 +37,14 @@ int main(int argc, char **argv) {
     int interface_index = if_nametoindex(wifi_interface);
     int driver_id;
     struct nl_sock *socket = NULL;
-    int seq_num = -1;
+    int seq_num = 0;
     int ack_seq_num = -1;
     int scan_retries_left = 4;
     int ack_retries_left = 4;
 
     while (1) {
         socket = init_socket();
+        // Find the nl80211 driver ID.
         driver_id = genl_ctrl_resolve(socket, "nl80211");
 
         struct ie_info **ies = (struct ie_info **) malloc((n_ies + 1) * sizeof(struct ie_info *));
@@ -52,7 +53,7 @@ int main(int argc, char **argv) {
 
         // The first IE contains the sequence number.
         char seq_num_str[17];
-        seq_num++;
+        // seq_num++;
         sprintf(seq_num_str, "%d", seq_num);
         ies[0] = create_vendor_ie(seq_num_str);
         ies_len += ies[0]->ie_len;
@@ -99,7 +100,7 @@ int main(int argc, char **argv) {
                     break;
             } else {  // Scanning done.
                 scan_retries_left = 3;
-                // sleep(1);
+                sleep(5);
 
                 /*
                  * Now get ACK for the stuffed probe request frames.

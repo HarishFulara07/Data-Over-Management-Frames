@@ -16,7 +16,6 @@ struct nl_sock * init_socket() {
     genl_connect(socket);
     // Set socket as a non-blocking socket.
     nl_socket_set_nonblocking(socket);
-    // Find the nl80211 driver ID.
 
     return socket;
 }

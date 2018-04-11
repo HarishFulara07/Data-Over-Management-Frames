@@ -764,9 +764,6 @@ void handle_probe_req(struct hostapd_data *hapd,
 			memcpy(seq_ie_stuffed_data, seq_stuffed_data + 3, elems.stuffed_data_len[0] - 3);
 			seq_ie_stuffed_data[elems.stuffed_data_len[0] - 3] = '\0';
 
-			// printf("Hello%d\n", atoi(seq_ie_stuffed_data));
-	  //       printf("World%d\n", last_recv_seq_num);
-
 			// if (atoi(seq_ie_stuffed_data) > last_recv_seq_num) {
 				printf("Seq number of received stuffed probe request frame is %s\n", seq_ie_stuffed_data);
 				int ack_seq_num = atoi(seq_ie_stuffed_data) + ies_len + 1;
