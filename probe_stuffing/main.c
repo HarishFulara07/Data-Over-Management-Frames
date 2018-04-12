@@ -5,32 +5,37 @@
 #include "headers.h"
 
 int main(int argc, char **argv) {
-    int opt, data_arg_idx, n_ies = 1;
-    char *wifi_interface = NULL, **data_to_stuff = NULL;
+    int opt;
+    char *wifi_interface = NULL, *data_to_stuff = NULL, *file_name = NULL;
 
-    while ((opt = getopt(argc, argv, "n:i:d:")) != -1) {
+    while ((opt = getopt(argc, argv, "i:d:f:")) != -1) {
         switch (opt) {
-            case 'n': 
-                n_ies = atoi(optarg);
-                data_to_stuff = (char **) malloc(n_ies * sizeof(char *));
-                data_arg_idx = 0;
-                break;
             case 'i':
                 wifi_interface = optarg;
                 break;
             case 'd':
-                if (data_arg_idx >= n_ies)
-                    break;
-                if (!data_to_stuff)
-                    data_to_stuff = (char **) malloc(n_ies * sizeof(char *));
-                data_to_stuff[data_arg_idx] = optarg;
-                ++data_arg_idx;
+                data_to_stuff = optarg;
+                break;
+            case 'f':
+                file_name = optarg;
                 break;
         }
     }
 
-    if (!(wifi_interface || data_to_stuff)) {
-        printf("Error: Invalid command line argument(s).\n");
+    if (!wifi_interface) {
+        printf("Error: Invalid command line argument(s). Requires interface.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (file_name) {
+        data_to_stuff = read_file(file_name);
+        if (!data_to_stuff) {
+            printf("Error: Unable to read input file.\n");
+            exit(EXIT_FAILURE);
+        }
+    } else if (!data_to_stuff) {
+        printf("Error: Invalid command line argument(s). Requires data "
+            "either from command line or from a file.\n");
         exit(EXIT_FAILURE);
     }
 
@@ -41,29 +46,58 @@ int main(int argc, char **argv) {
     int ack_seq_num = -1;
     int scan_retries_left = 4;
     int ack_retries_left = 4;
+    int len_data_to_stuff = strlen(data_to_stuff);
+    int len_data_already_stuffed = 0;
+    int max_ie_size = 1416;
 
-    while (1) {
+    while (len_data_already_stuffed != len_data_to_stuff) {
+        char *data;
+
+        // We can send data from seq_num to seq_num + 1416 bytes.
+        if (len_data_to_stuff - len_data_already_stuffed > max_ie_size) {
+            data = (char *)calloc(max_ie_size + 1, sizeof(char *));
+            memcpy(data, &data_to_stuff[seq_num], seq_num + max_ie_size);
+            data[max_ie_size] = '\0';
+            len_data_already_stuffed = seq_num + max_ie_size;
+        } else {
+            // This is last stuffed probe requests we will send.
+            int left = len_data_to_stuff - len_data_already_stuffed;
+            data = (char *)calloc(left + 1, sizeof(char *));
+            memcpy(data, &data_to_stuff[seq_num], left);
+            data[left] = '\0';
+            len_data_already_stuffed = len_data_to_stuff;
+        }
+
         socket = init_socket();
         // Find the nl80211 driver ID.
         driver_id = genl_ctrl_resolve(socket, "nl80211");
 
+        int n_ies = (strlen(data) / 252) + 1;
         struct ie_info **ies = (struct ie_info **) malloc((n_ies + 1) * sizeof(struct ie_info *));
         // Combined length of all IEs.
         size_t ies_len = 0;
 
         // The first IE contains the sequence number.
-        char seq_num_str[17];
-        // seq_num++;
+        char seq_num_str[8];
         sprintf(seq_num_str, "%d", seq_num);
         ies[0] = create_vendor_ie(seq_num_str);
         ies_len += ies[0]->ie_len;
         seq_num -= ies_len;
 
+        char **raw_ies_data = split_data(data, n_ies);
+        free(data);
+
         for (int i = 1; i < n_ies + 1; ++i) {
             // Create a vendor specific IE corresponding to the data sent by the client.
-            ies[i] = create_vendor_ie(data_to_stuff[i-1]);
+            ies[i] = create_vendor_ie(raw_ies_data[i-1]);
             ies_len += ies[i]->ie_len;
         }
+
+        // Freeing up.
+        for (int i = 0; i < n_ies; ++i) {
+            free(raw_ies_data[i]);
+        }
+        free(raw_ies_data);
 
         seq_num += ies_len - n_ies * 5;
 
@@ -100,7 +134,7 @@ int main(int argc, char **argv) {
                     break;
             } else {  // Scanning done.
                 scan_retries_left = 3;
-                sleep(5);
+                // sleep(5);
 
                 /*
                  * Now get ACK for the stuffed probe request frames.
@@ -167,13 +201,13 @@ int main(int argc, char **argv) {
         } else { // Everything went well :)
             // Sleep for 10 seconds before sending more data.
             printf("\nGoing to sleep for 15s before sending new scan request.\n");
-            sleep(15);
+            if (len_data_already_stuffed != len_data_to_stuff)
+                sleep(15);
         }
 
         nl_socket_free(socket);
         printf("\n");
     }
 
-    nl_socket_free(socket);
     return 0;
 }

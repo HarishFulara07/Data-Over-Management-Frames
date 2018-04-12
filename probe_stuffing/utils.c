@@ -175,3 +175,54 @@ int get_ack(struct nl_msg *msg, void *arg) {
 
     return NL_SKIP;
 }
+
+// Read the complete contents of file at once.
+char * read_file(char *file_name) {
+    FILE *file;
+    char *buffer;
+    long numbytes;
+
+    // Open the file for reading.
+    file = fopen(file_name, "r");
+
+    // Return if the file does not exist.
+    if(file == NULL)
+        return NULL;
+
+    // Get the number of bytes.
+    fseek(file, 0L, SEEK_END);
+    numbytes = ftell(file);
+
+    // Reset the file position indicator to the beginning of the file.
+    fseek(file, 0L, SEEK_SET);
+
+    buffer = (char*)malloc(numbytes * sizeof(char)); 
+
+    // Memory error.
+    if(buffer == NULL)
+        return NULL;
+
+    // Copy all the text into the buffer.
+    fread(buffer, sizeof(char), numbytes, file);
+    fclose(file);
+  
+    return buffer;
+}
+
+// Divide data into chunks of 252 bytes.
+char ** split_data(char *data, int n_ies) {
+    int len = strlen(data);
+    int i;
+    char **raw_ies_data = (char **)calloc(n_ies, (sizeof(char **)));
+
+    for (i = 0; i < n_ies - 1; ++i) {
+        raw_ies_data[i] = (char *)calloc(252, sizeof(char *));
+        memcpy(raw_ies_data[i], &data[i*252], 252);
+    }
+
+    int len_left = len - ((n_ies - 1) * 252);
+    raw_ies_data[i] = (char *)calloc(len_left, sizeof(char *));
+    memcpy(raw_ies_data[i], &data[i*252], len_left);
+
+    return raw_ies_data;
+}

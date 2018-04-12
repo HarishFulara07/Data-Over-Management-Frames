@@ -89,10 +89,11 @@ int do_probe_stuffing(struct nl_sock *socket, int interface_index,
     if (err < 0)
         printf("WARNING: err has a value of %d.\n", err);
 
-    if (ret < 0)
+    if (ret < 0) {
         printf("ERROR: nl_recvmsgs() returned %d (%s).\n", ret, nl_geterror(-ret));
         nl_geterror(-ret);
         return ret;
+    }
 
     while (!results.done)
         // Now wait until the scan is done or aborted.

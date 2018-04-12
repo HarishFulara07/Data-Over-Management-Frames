@@ -51,6 +51,8 @@ struct nl_sock * init_socket();
 int nl_get_multicast_id(struct nl_sock *, const char *, const char *);
 struct ie_info * create_vendor_ie(char *);
 int get_ack(struct nl_msg *, void *);
+char * read_file(char *);
+char ** split_data(char *, int);
 
 // Probe stuffing fuction.
 int do_probe_stuffing(struct nl_sock *, int, int, int, unsigned char *);
