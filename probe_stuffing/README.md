@@ -12,15 +12,17 @@ sudo apt-get install libnl-genl-3-dev
 
 Build with: `make`
 
-Run with: `sudo ./probe_stuffing -i <Network Interface> -n <Number of IEs> -d <Data 1> -d <Data 2> ... -d <Data n>`
+Run with: `sudo ./probe_stuffing -i <Network Interface> -d <Data> or -f <File Name>`
 
 `<Network Interface>` The network interface to use for sending scan request. Data is stuffed inside the probe request packets sent during the scan request.
 
-`<Number of IEs>` The number of IEs to send (should be max 10).  Note: hostapd code can handle max 10 stuffed IEs.
+`<Data>` The data to stuff inside the IEs.
 
-`<Data>` The data to stuff inside the IEs. The data can be max 252 characters long. 
+`<File Name>` Read data from the given file and stuff it inside the IEs.
 
-Example: `sudo ./probe_stuffing -i wlan0 -n 3 -d "IE Data 1" -d "IE Data 2" -d "IE Data 3"` 
+Example: `sudo ./probe_stuffing -i wlan0 -d "LoremIpsumDolor"`
+
+`sudo ./probe_stuffing -i wlan0 -f abc.txt`
 
 ## Resources:
 [1] http://git.kernel.org/cgit/linux/kernel/git/jberg/iw.git/tree/scan.c
