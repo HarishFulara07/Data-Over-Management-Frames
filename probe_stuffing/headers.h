@@ -10,6 +10,7 @@
 #include <netlink/genl/genl.h>
 #include <netlink/netlink.h>
 #include <stdio.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 /*
@@ -53,6 +54,7 @@ struct ie_info * create_vendor_ie(char *);
 int get_ack(struct nl_msg *, void *);
 char * read_file(char *);
 char ** split_data(char *, int);
+int get_n_ies_reqd(size_t);
 
 // Probe stuffing fuction.
 int do_probe_stuffing(struct nl_sock *, int, int, int, unsigned char *);

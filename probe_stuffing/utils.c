@@ -177,13 +177,13 @@ int get_ack(struct nl_msg *msg, void *arg) {
 }
 
 // Read the complete contents of file at once.
-char * read_file(char *file_name) {
+char * read_file(char *file_path) {
     FILE *file;
     char *buffer;
     long numbytes;
 
     // Open the file for reading.
-    file = fopen(file_name, "r");
+    file = fopen(file_path, "r");
 
     // Return if the file does not exist.
     if(file == NULL)
@@ -225,4 +225,13 @@ char ** split_data(char *data, int n_ies) {
     memcpy(raw_ies_data[i], &data[i*252], len_left);
 
     return raw_ies_data;
+}
+
+// Get number of IEs required.
+int get_n_ies_reqd(size_t len_data_to_stuff) {
+    if (len_data_to_stuff % 252 == 0) {
+        return (len_data_to_stuff / 252);
+    } else {
+        return (len_data_to_stuff / 252) + 1;
+    }
 }
