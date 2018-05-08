@@ -6,7 +6,7 @@
 
 int main(int argc, char **argv) {
     int opt;
-    int effort;
+    int effort = 2;
     char *wifi_interface = NULL;
     char *data_to_stuff = NULL;
     char *file_path = NULL;
@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
      *     will be stuffed inside the PReq packets sent during the scan.
      * d = Data to stuff inside the IEs.
      * f = Path to the file containing data to stuff.
-     * e = Delivery effort (1 = Best, 2 = Guaranteed)
+     * e = Delivery effort (1 = Best delivery, 2 = Guaranteed delivery). Default = 2.
      *
      * NOTE: We can specify data to stuff inside IEs using either 'd' or 'f'
      * command line parameter. If both are specified, then we will give
@@ -60,6 +60,13 @@ int main(int argc, char **argv) {
         printf("Error: Invalid command line argument(s). Requires data "
             "either from command line or from a file.\n");
         exit(EXIT_FAILURE);
+    }
+
+    printf("\n======================================\n");
+    if (effort == 2) {
+        printf("Effort: Guaranteed delivery\n");
+    } else {
+        printf("Effort: Best delivery\n");
     }
 
     int interface_index = if_nametoindex(wifi_interface);
@@ -113,6 +120,7 @@ int main(int argc, char **argv) {
     gettimeofday(&tv, NULL);
     sprintf(timestamp_str, "%018llu", (unsigned long long int) (tv.tv_sec * 1000) + (tv.tv_usec / 1000));
     printf("Timestamp (in ms): %s\n", timestamp_str);
+    printf("======================================\n");
 
     // Continue untill we have no more data to stuff.
     while (len_data_already_stuffed < len_data_to_stuff) {
@@ -218,8 +226,9 @@ int main(int argc, char **argv) {
                     sleep(15);
                     // Re-initialize the socket.
                     socket = init_socket();
-                } else
+                } else {
                     break;
+                }
             } else {  // Scanning done.
                 scan_retries_left = 3;
                 // sleep(5);
@@ -242,32 +251,49 @@ int main(int argc, char **argv) {
 
                 if (ret < 0) {  // Didn't receive an ACK.
                     printf("ERROR: nl_recvmsgs_default() returned %d (%s).\n", ret, nl_geterror(-ret));
-                    ack_retries_left--;
-
-                    if (ack_retries_left > 0) {
-                        nl_socket_free(socket);
-                        // Wait for 15 seconds before sending new scan request.
-                        printf("%d retries left. Will retry after 15s.\n", ack_retries_left);
-                        sleep(15);
-                        socket = init_socket();
-                    } else
-                        break;
-                } else {  // Received an ACK.
-                    printf("Expected ACK: %d\n", seq_num + 1);
-                    printf("Received ACK: %d\n", ack_seq_num);
-                    // Invalid ACK. Retry.
-                    if (ack_seq_num == -1 || ack_seq_num != seq_num + 1) {
+                    
+                    // Retry only if it is guaranteed delivery effort.
+                    if (effort == 2) {
                         ack_retries_left--;
-                        printf("Invalid received ACK.\n");
-                        
+
                         if (ack_retries_left > 0) {
                             nl_socket_free(socket);
                             // Wait for 15 seconds before sending new scan request.
                             printf("%d retries left. Will retry after 15s.\n", ack_retries_left);
                             sleep(15);
                             socket = init_socket();
-                        } else
+                        } else {
                             break;
+                        }
+                    } else { // Don't retry for best delivery effort.
+                        printf("Will not retry since it is best delivery effort...\n");
+                        seq_num += 1;
+                        break;
+                    }
+                } else {  // Received an ACK.
+                    printf("Expected ACK: %d\n", seq_num + 1);
+                    printf("Received ACK: %d\n", ack_seq_num);
+                    // Invalid ACK. Retry.
+                    if (ack_seq_num == -1 || ack_seq_num != seq_num + 1) {
+                        // Retry only if it is guaranteed delivery effort.
+                        if (effort == 2) {
+                            ack_retries_left--;
+                            printf("Invalid received ACK.\n");
+                            
+                            if (ack_retries_left > 0) {
+                                nl_socket_free(socket);
+                                // Wait for 15 seconds before sending new scan request.
+                                printf("%d retries left. Will retry after 15s.\n", ack_retries_left);
+                                sleep(15);
+                                socket = init_socket();
+                            } else {
+                                break;
+                            }
+                        } else { // Don't retry for best delivery effort.
+                            printf("Will not retry since it is best delivery effort...\n");
+                            seq_num += 1;
+                            break;
+                        }
                     } else {  // Everything went well. Scan and ACK flow completed.
                         printf("ACK received successfully.\n\nWaiting for 15s before sending more data.");
                         fflush(stdout);
@@ -289,8 +315,9 @@ int main(int argc, char **argv) {
         } else { // Everything went well :)
             // Sleep for 10 seconds before sending more data.
             printf("\nGoing to sleep for 15s before sending new scan request.\n");
-            if (len_data_already_stuffed != len_data_to_stuff)
+            if (len_data_already_stuffed != len_data_to_stuff) {
                 sleep(15);
+            }
         }
 
         nl_socket_free(socket);
