@@ -118,7 +118,8 @@ int main(int argc, char **argv) {
     struct timeval tv;
     char timestamp_str[19];
     gettimeofday(&tv, NULL);
-    sprintf(timestamp_str, "%018llu", (unsigned long long int) (tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+    // sprintf(timestamp_str, "%018llu", (unsigned long long int) (tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+    sprintf(timestamp_str, "%018llu", (uint64_t) tv.tv_sec * (uint64_t) 1000000 + (uint64_t) tv.tv_usec);
     printf("Timestamp (in ms): %s\n", timestamp_str);
     printf("======================================\n");
 

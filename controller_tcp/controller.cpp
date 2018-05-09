@@ -112,7 +112,7 @@ process_and_save(uint64_t con_ts, char *string, sqlite3 *db) {
                                      "data_length, " \
                                      "data" \
                                      ") " \
-                                     "VALUES('%s', %s, %s, %ld, %s, %s, %s, %s, '%s');";
+                                     "VALUES('%s', %s, %s, %018llu, %s, %s, %s, %s, '%s');";
 	char sql_insert[1024];
 	snprintf(sql_insert, 1024, sql_insert_template,
 	         DB_TABLE_NAME,

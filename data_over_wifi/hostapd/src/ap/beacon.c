@@ -786,9 +786,17 @@ void handle_probe_req(struct hostapd_data *hapd,
 			timestamp_str[18] = '\0';
 			mfb_str[1] = '\0';
 
+			// Current Timestamp (in ms). This will be same for all the PReq frames.
+		    struct timeval tv;
+		    char ap_timestamp_str[19];
+		    gettimeofday(&tv, NULL);
+		    // sprintf(ap_timestamp_str, "%018llu", (unsigned long long int) (tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+		    sprintf(ap_timestamp_str, "%018llu", (uint64_t) tv.tv_sec * (uint64_t) 1000000 + (uint64_t) tv.tv_usec);
+
 			printf("\nClient MAC address: %s\n", client_mac);
 			printf("Seq. number: %s\n", seq_num_str);
 			printf("Timestamp (in ms): %s\n", timestamp_str);
+			printf("AP Timestamp (in ms): %s\n", ap_timestamp_str);
 			printf("MFB: %s\n", mfb_str);
 			printf("Total bytes received: %d\n", ies_len);
 			printf("Received stuffed data: %s\n\n", recv_data);
@@ -827,6 +835,15 @@ void handle_probe_req(struct hostapd_data *hapd,
 
 			hapd->conf->probe_resp_ack_ie = wpabuf_alloc(ie_ack_len);
 			wpabuf_put_data(hapd->conf->probe_resp_ack_ie, ie_ack, ie_ack_len);
+
+			// Send data to server/controller/backend over tcp/ip
+			// TODO
+			char *csv = (char *) calloc(500, sizeof(char));
+			snprintf(csv, 500, "%s,%s,%s,%s,1,%s,%d,%s", 
+								client_mac, timestamp_str, ap_timestamp_str, seq_num_str, mfb_str, ies_len, recv_data);
+			snprintf(command, strlen(csv) + 100, "tcpclient.out --tcp -h%s -p%d -s\"%s\"", "ARG_HOST", 1234, csv);
+			// call script using system command
+			printf("%s\n", command);
 
 			// Freeing up.
 			for (int i = 0; i < elems.n_stuffed_ies - 1; ++i) {
