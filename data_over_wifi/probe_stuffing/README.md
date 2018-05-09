@@ -12,7 +12,7 @@ sudo apt-get install libnl-genl-3-dev
 
 Build with: `make`
 
-Run with: `sudo ./probe_stuffing -i <Network Interface> -d <Data> or -f <File Name>`
+Run with: `sudo ./probe_stuffing -i <Network Interface> -d <Data> or -f <File Name> -e <Delivery Effort>`
 
 `<Network Interface>` The network interface to use for sending scan request. Data is stuffed inside the probe request packets sent during the scan request.
 
@@ -20,9 +20,18 @@ Run with: `sudo ./probe_stuffing -i <Network Interface> -d <Data> or -f <File Na
 
 `<File Name>` Read data from the given file and stuff it inside the IEs.
 
-Example: `sudo ./probe_stuffing -i wlan0 -d "LoremIpsumDolor"`
+`<Delivery Effort>` 1 for Best delivery effort and 2 for Guaranteed delivery effort. Default = 2.
 
-`sudo ./probe_stuffing -i wlan0 -f abc.txt`
+Example (Best Delivery Effort): `sudo ./probe_stuffing -i wlan0 -d "LoremIpsumDolor" -e 1`
+
+`sudo ./probe_stuffing -i wlan0 -f abc.txt -e 1`
+
+Example (Guaranteed Delivery Effort): `sudo ./probe_stuffing -i wlan0 -d "LoremIpsumDolor" -e 2`
+
+`sudo ./probe_stuffing -i wlan0 -f abc.txt -e 2`
+
+
+
 
 ## Resources:
 [1] http://git.kernel.org/cgit/linux/kernel/git/jberg/iw.git/tree/scan.c
