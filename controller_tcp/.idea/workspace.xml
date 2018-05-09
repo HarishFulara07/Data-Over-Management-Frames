@@ -18,7 +18,17 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf>
+      <file leaf-file-name="client.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/client.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="240">
+              <caret line="134" column="52" lean-forward="true" selection-start-line="134" selection-start-column="52" selection-end-line="134" selection-end-column="52" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -70,6 +80,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../data_gen" />
     <property name="settings.editor.selected.configurable" value="preferences.sourceCode.C/C++" />
   </component>
   <component name="RunDashboard">
@@ -99,14 +110,16 @@
       <workItem from="1525795854632" duration="168000" />
       <workItem from="1525796039012" duration="8340000" />
       <workItem from="1525840399508" duration="45000" />
+      <workItem from="1525840847530" duration="2262000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="52498000" />
+    <option name="totallyTimeSpent" value="54760000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="64" y="-11" width="1303" height="780" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1541471" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -196,8 +209,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/client.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1566">
-          <caret line="107" column="9" selection-start-line="107" selection-start-column="9" selection-end-line="107" selection-end-column="9" />
+        <state relative-caret-position="240">
+          <caret line="134" column="52" lean-forward="true" selection-start-line="134" selection-start-column="52" selection-end-line="134" selection-end-column="52" />
         </state>
       </provider>
     </entry>
