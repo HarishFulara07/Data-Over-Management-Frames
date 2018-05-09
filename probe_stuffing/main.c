@@ -115,16 +115,19 @@ int main(int argc, char **argv) {
     int ies_max_data_size = 1394;
 
     // Current Timestamp (in ms). This will be same for all the PReq frames.
-    struct timeval tv;
-    char timestamp_str[19];
-    gettimeofday(&tv, NULL);
-    sprintf(timestamp_str, "%018llu", (unsigned long long int) (tv.tv_sec * 1000) + (tv.tv_usec / 1000));
-    printf("Timestamp (in ms): %s\n", timestamp_str);
+    struct timeval data_origin_tv;
+    gettimeofday(&data_origin_tv, NULL);
+    unsigned long long int data_origin_ts = (data_origin_tv.tv_sec * 1000) 
+                                                + (data_origin_tv.tv_usec / 1000);
+    char data_origin_ts_str[19];
+    sprintf(data_origin_ts_str, "%018llu", data_origin_ts);
+    printf("Timestamp (in ms): %s\n", data_origin_ts_str);
     printf("======================================\n");
 
     // Continue untill we have no more data to stuff.
     while (len_data_already_stuffed < len_data_to_stuff) {
         char *data;
+        int data_size;
         // Index in our 'data_to_stuff' string from where we will start stuffing.
         int data_start_idx = seq_num * ies_max_data_size;
         // More fragment bit.
@@ -172,7 +175,7 @@ int main(int argc, char **argv) {
         sprintf(seq_num_str, "%08d", seq_num);
         sprintf(mfb_str, "%d", mfb);
         strcpy(additional_data, seq_num_str);
-        strcat(additional_data, timestamp_str);
+        strcat(additional_data, data_origin_ts_str);
         strcat(additional_data, mfb_str);
 
         // Create the first IE.
@@ -181,6 +184,7 @@ int main(int argc, char **argv) {
 
         // Divide the data into 252 bytes chunks.
         char **raw_ies_data = split_data(data, n_ies);
+        data_size = strlen(data);
         free(data);
 
         for (int i = 1; i < n_ies + 1; ++i) {
@@ -212,6 +216,14 @@ int main(int argc, char **argv) {
              * Send stuffed probe request frame.
              */
 
+            // Data transmission timestamp.
+            struct timeval data_tx_tv;
+            gettimeofday(&data_tx_tv, NULL);
+            unsigned long long int data_tx_ts = (data_tx_tv.tv_sec * 1000) 
+                                                        + (data_tx_tv.tv_usec / 1000);
+
+            printf("\nData transmission timestamp (in ms): %llu", data_tx_ts);
+
             // Issue NL80211_CMD_TRIGGER_SCAN to the kernel and wait for it to finish.
             int err = do_probe_stuffing(socket, interface_index, driver_id, ies_len, ies_data);
 
@@ -230,7 +242,7 @@ int main(int argc, char **argv) {
                     break;
                 }
             } else {  // Scanning done.
-                scan_retries_left = 3;
+                scan_retries_left = 4;
                 // sleep(5);
 
                 /*
@@ -252,6 +264,9 @@ int main(int argc, char **argv) {
                 if (ret < 0) {  // Didn't receive an ACK.
                     printf("ERROR: nl_recvmsgs_default() returned %d (%s).\n", ret, nl_geterror(-ret));
                     
+                    log_info(wifi_interface, data_origin_ts, data_origin_ts_str, 
+                        data_tx_ts, data_size, 5 - ack_retries_left, -1);
+
                     // Retry only if it is guaranteed delivery effort.
                     if (effort == 2) {
                         ack_retries_left--;
@@ -275,6 +290,8 @@ int main(int argc, char **argv) {
                     printf("Received ACK: %d\n", ack_seq_num);
                     // Invalid ACK. Retry.
                     if (ack_seq_num == -1 || ack_seq_num != seq_num + 1) {
+                        log_info(wifi_interface, data_origin_ts, data_origin_ts_str, 
+                            data_tx_ts, data_size, 5 - ack_retries_left, -1);
                         // Retry only if it is guaranteed delivery effort.
                         if (effort == 2) {
                             ack_retries_left--;
@@ -295,11 +312,13 @@ int main(int argc, char **argv) {
                             break;
                         }
                     } else {  // Everything went well. Scan and ACK flow completed.
+                        log_info(wifi_interface, data_origin_ts, data_origin_ts_str, 
+                            data_tx_ts, data_size, 5 - ack_retries_left, 1);
                         printf("ACK received successfully.\n\nWaiting for 15s before sending more data.");
                         fflush(stdout);
                         seq_num += 1;
                         free(ies_data);
-                        ack_retries_left = 3;
+                        ack_retries_left = 4;
                         break;
                     }
                 }
