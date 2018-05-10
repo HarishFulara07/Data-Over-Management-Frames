@@ -241,11 +241,11 @@ void log_info(char *wifi_interface, unsigned long long int data_origin_ts, char 
 	unsigned long long int data_tx_ts, int data_size, int attempt, int status) {
 
 	// Log file name = client's wifi interface name + data origin timstamp
-	char log_file_path[50] = "logs/";
-	strcat(log_file_path, wifi_interface);
-	strcat(log_file_path, "_");
-	strcat(log_file_path, data_origin_ts_str);
-	strcat(log_file_path, ".txt");
+	char log_file_path[50] = "logs/client_log.log";
+	//strcat(log_file_path, wifi_interface);
+	//strcat(log_file_path, "_");
+	//strcat(log_file_path, data_origin_ts_str);
+	//strcat(log_file_path, ".txt");
 
 	FILE *file;
 	file = fopen(log_file_path, "a");
