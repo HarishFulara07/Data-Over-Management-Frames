@@ -95,10 +95,29 @@ main(int argc, char *argv[]) {
 	}
 	printf("\n");
 
+	// TODO: put path here!
+	char path_to_probing_script[100] = "";
+
 	char *randstr = gen_rand_string();
-	char *command = (char *) calloc(ARG_BYTES + 100, sizeof(char));
-	snprintf(command, ARG_BYTES + 100, "probe.out -i%s -d\"%s\"", ARG_IFACE, randstr);
-	printf("%s\n", command);
-	// system(command);
+	char *script_com = (char *) calloc(ARG_BYTES + 100, sizeof(char));
+	snprintf(script_com, ARG_BYTES + 100, "%s -i%s -d\"%s\"", path_to_probing_script, ARG_IFACE, randstr);
+
+	char up_com[50], down_com[50];
+	snprintf(up_com, 50, "sudo ifconfig %s up", ARG_IFACE);
+	snprintf(down_com, 50, "sudo ifconfig %s down", ARG_IFACE);
+
+	// Load the wifi driver
+	printf("loading driver: \n%s\n%s", up_com, "sudo modprobe ath9k_htc");
+	system(up_com);
+	system("sudo modprobe ath9k_htc");
+
+	printf("running: %s\n", script_com);
+	system(script_com);
+
+	// Unload the wifi driver
+	printf("unloading driver: \n%s\n%s", "sudo modprobe -r ath9k_htc", down_com);
+	system("sudo modprobe -r ath9k_htc");
+	system(down_com);
+
 	return 0;
 }

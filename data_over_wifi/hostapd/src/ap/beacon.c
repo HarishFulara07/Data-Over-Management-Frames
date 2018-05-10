@@ -837,13 +837,16 @@ void handle_probe_req(struct hostapd_data *hapd,
 			wpabuf_put_data(hapd->conf->probe_resp_ack_ie, ie_ack, ie_ack_len);
 
 			// Send data to server/controller/backend over tcp/ip
-			// TODO
 			char *csv = (char *) calloc(500, sizeof(char));
+			char *command = (char *) calloc(700, sizeof(char));
 			snprintf(csv, 500, "%s,%s,%s,%s,1,%s,%d,%s", 
 								client_mac, timestamp_str, ap_timestamp_str, seq_num_str, mfb_str, ies_len, recv_data);
-			snprintf(command, strlen(csv) + 100, "tcpclient.out --tcp -h%s -p%d -s\"%s\"", "ARG_HOST", 1234, csv);
+			
+			// *TODO*: Replace hardcoded path, host and port with cmdline args
+			snprintf(command, strlen(csv) + 200, "/home/wireless/gursimran/wifi-over-management-frames/bin/tcpclient.out --tcp -h%s -p%d -s\"%s\"", "10.0.0.1", 10001, csv);
 			// call script using system command
-			printf("%s\n", command);
+			printf("running: %s\n", command);
+			system(command);
 
 			// Freeing up.
 			for (int i = 0; i < elems.n_stuffed_ies - 1; ++i) {
