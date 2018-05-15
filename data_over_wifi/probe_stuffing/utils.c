@@ -237,8 +237,8 @@ int get_n_ies_reqd(size_t len_data_to_stuff) {
 }
 
 // Client side logging.
-void log_info(char *wifi_interface, unsigned long long int data_origin_ts, char *data_origin_ts_str,
-	unsigned long long int data_tx_ts, int data_size, int attempt, int status) {
+void log_info(char *wifi_interface, unsigned int data_origin_ts, unsigned int data_origin_ts_usec, char *data_origin_ts_str,
+	unsigned int data_tx_ts, unsigned int data_tx_ts_usec, int data_size, int attempt, int status) {
 
 	// Log file name = client's wifi interface name + data origin timstamp
 	char log_file_path[50] = "logs/client_log.log";
@@ -255,11 +255,12 @@ void log_info(char *wifi_interface, unsigned long long int data_origin_ts, char 
 		return;
 	}
 
-	fprintf(file, "Attempt: %d\n", attempt);
-	fprintf(file, "Data Size: %d\n", data_size);
-	fprintf(file, "Data Origin Timestamp: %llu\n", data_origin_ts);
-	fprintf(file, "Data Transmission Timestamp: %llu\n", data_tx_ts);
-	fprintf(file, "Status: %d\n\n", status);
+	// Attempt, Data Size, Data Origin Timestamp, Data Transmission TImestamp, Status
+	fprintf(file, "%d, ", attempt);
+	fprintf(file, "%d, ", data_size);
+	fprintf(file, "%u%06u, ", data_origin_ts, data_origin_ts_usec);
+	fprintf(file, "%u%06u, ", data_tx_ts, data_tx_ts_usec);
+	fprintf(file, "%d\n", status);
 
 	fclose(file);
 }

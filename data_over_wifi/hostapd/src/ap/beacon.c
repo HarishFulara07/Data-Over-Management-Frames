@@ -808,7 +808,7 @@ void handle_probe_req(struct hostapd_data *hapd,
 				printf("MF bit is 0, i.e. client has no more data to send.\n\n");
 			}
 
-			int ack_seq_num = atoi(seq_num_str) + 1;
+			int ack_seq_num = atoi(seq_num_str);
 			printf("ACK sent: %d\n", ack_seq_num);
 			char ack_seq_num_str[9];
 			sprintf(ack_seq_num_str, "%d", ack_seq_num);

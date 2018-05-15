@@ -117,10 +117,10 @@ int main(int argc, char **argv) {
     // Current Timestamp (in ms). This will be same for all the PReq frames.
     struct timeval data_origin_tv;
     gettimeofday(&data_origin_tv, NULL);
-    unsigned long long int data_origin_ts = (data_origin_tv.tv_sec * 1000) 
-                                                + (data_origin_tv.tv_usec / 1000);
-    char data_origin_ts_str[19];
-    sprintf(data_origin_ts_str, "%018llu", data_origin_ts);
+    unsigned int data_origin_ts = (data_origin_tv.tv_sec);
+    unsigned int data_origin_ts_usec = (data_origin_tv.tv_usec);
+    char data_origin_ts_str[20];
+    sprintf(data_origin_ts_str, "%012u%06u", data_origin_ts, data_origin_ts_usec);
     printf("Timestamp (in ms): %s\n", data_origin_ts_str);
     printf("======================================\n");
 
@@ -219,10 +219,10 @@ int main(int argc, char **argv) {
             // Data transmission timestamp.
             struct timeval data_tx_tv;
             gettimeofday(&data_tx_tv, NULL);
-            unsigned long long int data_tx_ts = (data_tx_tv.tv_sec * 1000) 
-                                                        + (data_tx_tv.tv_usec / 1000);
+            unsigned int data_tx_ts = (data_tx_tv.tv_sec);
+            unsigned int data_tx_ts_usec = (data_tx_tv.tv_usec);
 
-            printf("\nData transmission timestamp (in ms): %llu", data_tx_ts);
+            printf("\nData transmission timestamp (in ms): %u%06u", data_tx_ts, data_tx_ts_usec);
 
             // Issue NL80211_CMD_TRIGGER_SCAN to the kernel and wait for it to finish.
             int err = do_probe_stuffing(socket, interface_index, driver_id, ies_len, ies_data);
@@ -263,9 +263,8 @@ int main(int argc, char **argv) {
 
                 if (ret < 0) {  // Didn't receive an ACK.
                     printf("ERROR: nl_recvmsgs_default() returned %d (%s).\n", ret, nl_geterror(-ret));
-                    
-                    log_info(wifi_interface, data_origin_ts, data_origin_ts_str, 
-                        data_tx_ts, data_size, 5 - ack_retries_left, -1);
+                    log_info(wifi_interface, data_origin_ts, data_origin_ts_usec, data_origin_ts_str, data_tx_ts, 
+                             data_tx_ts_usec, data_size, 5 - ack_retries_left, -1);
 
                     // Retry only if it is guaranteed delivery effort.
                     if (effort == 2) {
@@ -286,12 +285,12 @@ int main(int argc, char **argv) {
                         break;
                     }
                 } else {  // Received an ACK.
-                    printf("Expected ACK: %d\n", seq_num + 1);
+                    printf("Expected ACK: %d\n", seq_num);
                     printf("Received ACK: %d\n", ack_seq_num);
                     // Invalid ACK. Retry.
-                    if (ack_seq_num == -1 || ack_seq_num != seq_num + 1) {
-                        log_info(wifi_interface, data_origin_ts, data_origin_ts_str, 
-                            data_tx_ts, data_size, 5 - ack_retries_left, -1);
+                    if (ack_seq_num == -1 || ack_seq_num != seq_num) {
+                        log_info(wifi_interface, data_origin_ts, data_origin_ts_usec, data_origin_ts_str, 
+                            data_tx_ts, data_tx_ts_usec, data_size, 5 - ack_retries_left, -1);
                         // Retry only if it is guaranteed delivery effort.
                         if (effort == 2) {
                             ack_retries_left--;
@@ -312,8 +311,8 @@ int main(int argc, char **argv) {
                             break;
                         }
                     } else {  // Everything went well. Scan and ACK flow completed.
-                        log_info(wifi_interface, data_origin_ts, data_origin_ts_str, 
-                            data_tx_ts, data_size, 5 - ack_retries_left, 1);
+                        log_info(wifi_interface, data_origin_ts, data_origin_ts_usec, data_origin_ts_str, 
+                            data_tx_ts, data_tx_ts_usec, data_size, 5 - ack_retries_left, 1);
                         printf("ACK received successfully.\n\nWaiting for 15s before sending more data.");
                         fflush(stdout);
                         seq_num += 1;

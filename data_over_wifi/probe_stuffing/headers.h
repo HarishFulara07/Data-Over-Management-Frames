@@ -55,7 +55,7 @@ int get_ack(struct nl_msg *, void *);
 char * read_file(char *);
 char ** split_data(char *, int);
 int get_n_ies_reqd(size_t);
-void log_info(char *, unsigned long long int, char *, unsigned long long int, int, int, int);
+void log_info(char *, unsigned int, unsigned int, char *, unsigned int, unsigned int, int, int, int);
 
 // Probe stuffing fuction.
 int do_probe_stuffing(struct nl_sock *, int, int, int, unsigned char *);

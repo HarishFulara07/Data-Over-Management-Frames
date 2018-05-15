@@ -100,14 +100,14 @@ main(int argc, char *argv[]) {
 	char path_to_probing_script[100] = "/home/mate/Desktop/domf-code/data_over_wifi/probe_stuffing/probe_stuffing";
 	char *randstr = gen_rand_string();
 	char *script_com = (char *) calloc(ARG_BYTES + 100, sizeof(char));
-	snprintf(script_com, ARG_BYTES + 300, "%s -i%s -d\"%s\"", path_to_probing_script, ARG_IFACE, randstr);
+	snprintf(script_com, ARG_BYTES + 300, "%s -i%s -d\"%s\" -e1", path_to_probing_script, ARG_IFACE, randstr);
 
 	char up_com[50], down_com[50];
 	snprintf(up_com, 50, "sudo ifconfig %s up", ARG_IFACE);
 	snprintf(down_com, 50, "sudo ifconfig %s down", ARG_IFACE);
 
 	// Load the wifi driver
-	printf("loading driver: \n%s\n%s\n", up_com, "sudo modprobe ath9k_htc");
+	printf("turning interface on: \n%s\n", up_com);
         //system("sudo modprobe ath9k_htc");
 	//sleep(3);
 	system(up_com);
@@ -116,7 +116,7 @@ main(int argc, char *argv[]) {
 	system(script_com);
 
 	// Unload the wifi driver
-	printf("unloading driver: \n%s\n%s\n", "sudo modprobe -r ath9k_htc", down_com);
+	printf("turning interface off: \n%s\n", down_com);
 	system(down_com);
 	//system("sudo modprobe -r ath9k_htc");
 	
