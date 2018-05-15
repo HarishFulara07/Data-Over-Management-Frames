@@ -54,7 +54,7 @@ connect_client() {
 		client_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	}
 	if (client_sockfd < 0) {
-		error("ERROR opening socket");
+		error("Could not open fd");
 	}
 
 	// get host
@@ -69,8 +69,9 @@ connect_client() {
 	server_addr.sin_family = AF_INET;
 	bcopy((char *) server->h_addr, (char *) &server_addr.sin_addr.s_addr, server->h_length);
 	server_addr.sin_port = htons(ARG_PORT);
-	if (connect(client_sockfd, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
-		error("ERROR connecting");
+	while (connect(client_sockfd, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
+		printf("Could not connect! Retrying in 5 seconds ...\n");
+		sleep(5);
 	}
 
 	return client_sockfd;
@@ -107,10 +108,8 @@ transmit(int client_sockfd) {
 			printf("\n");
 		}
 
-		// clear buffer
-		bzero(buffer, BUFFER_SZ);
 		// free the memory
-		free(buffer);
+		//free(buffer);
 	}
 }
 

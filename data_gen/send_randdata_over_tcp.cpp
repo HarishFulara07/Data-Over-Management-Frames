@@ -10,11 +10,40 @@
 #include <cstring>
 #include <getopt.h>
 #include <ctime>
+#include <unistd.h>
+#include <errno.h>
+#include <getopt.h>
+#include <sys/types.h>
+#include <sys/time.h>
 
 static char *ARG_HOST = NULL;
 static int ARG_BYTES = 200;
 static int ARG_PORT = -1;
-static
+
+void log_info(unsigned long long int data_origin_ts, char* data) {
+
+	// Log file name = client's wifi interface name + data origin timstamp
+	char log_file_path[50] = "logs/clienttcp_log.log";
+	//strcat(log_file_path, wifi_interface);
+	//strcat(log_file_path, "_");
+	//strcat(log_file_path, data_origin_ts_str);
+	//strcat(log_file_path, ".txt");
+
+	FILE *file;
+	file = fopen(log_file_path, "a");
+
+	if (file == NULL) {
+		printf("\nUnable to open '%s' file.\n", log_file_path);
+		return;
+	}
+
+	fprintf(file, "Data Size: %d\n", strlen(data));
+	fprintf(file, "Data Origin Timestamp: %018llu\n", data_origin_ts);
+	fprintf(file, "Data: %s\n", data);
+	fprintf(file, "\n");
+	fclose(file);
+}
+
 
 void
 error(const char *msg) {
@@ -23,8 +52,7 @@ error(const char *msg) {
 }
 
 char *gen_rand_string() {
-	static const char alphanum[] =
-			"0123456789"
+	static const char alphanum[] = "0123456789"
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			"abcdefghijklmnopqrstuvwxyz";
 
@@ -110,9 +138,19 @@ main(int argc, char *argv[]) {
 	printf("\n");
 
 	char *randstr = gen_rand_string();
+
+	// get data received timestamp
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	unsigned long long gen_ts = tv.tv_sec * (unsigned long long) 1000000 + tv.tv_usec;
+
 	char *command = (char *) calloc(ARG_BYTES + 100, sizeof(char));
-	snprintf(command, ARG_BYTES + 100, "tcpclient.out --tcp -h%s -p%d -s\"%s\"", ARG_HOST, ARG_PORT, randstr);
+	snprintf(command, ARG_BYTES + 300, "/home/mate/Desktop/domf-code/bin/tcpclient.out --tcp -h%s -p%d -s\"NA,%018llu,0,0,0,0,%d,%s\"", 
+			ARG_HOST, ARG_PORT, gen_ts, strlen(randstr), randstr);
 	printf("%s\n", command);
-	// system(command);
+
+	printf("issuing command...\n");
+	system(command);
+	log_info(gen_ts, randstr);
 	return 0;
 }
