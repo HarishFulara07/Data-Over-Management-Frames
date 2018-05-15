@@ -843,7 +843,7 @@ void handle_probe_req(struct hostapd_data *hapd,
 								client_mac, timestamp_str, ap_timestamp_str, seq_num_str, mfb_str, ies_len, recv_data);
 			
 			// *TODO*: Replace hardcoded path, host and port with cmdline args
-			snprintf(command, strlen(csv) + 200, "/home/wireless/gursimran/wifi-over-management-frames/bin/tcpclient.out --tcp -h%s -p%d -s\"%s\"", "10.0.0.1", 10001, csv);
+			snprintf(command, strlen(csv) + 200, "/home/wireless/gursimran/wifi-over-management-frames/bin/tcpclient.out --tcp -h%s -p%d -s\"%s\"", "192.168.1.1", 10001, csv);
 			// call script using system command
 			printf("running: %s\n", command);
 			system(command);
