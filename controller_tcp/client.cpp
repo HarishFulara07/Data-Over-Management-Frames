@@ -43,7 +43,7 @@ char *get_timestamp_as_string() {
     unsigned long long ts = tv.tv_sec * (unsigned long long) 1000000 + tv.tv_usec;
 
     char *as_string = (char *) malloc(19 * sizeof(char));
-    snprintf(as_string, 19, "%018llu", ts);
+    snprintf(as_string, 19, "%018llu\n", ts);
     return as_string;
 }
 
@@ -83,19 +83,19 @@ connect_client() {
     server_addr.sin_port = htons(ARG_PORT);
 
     char *ts = get_timestamp_as_string();
-    printf("attempting to connect() <ts: %s>", ts);
+    printf("attempting to connect() <ts: %s>\n", ts);
     while (connect(client_sockfd, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
         printf("Could not connect! Retrying in 5 seconds ...\n");
         sleep(5);
 
         free(ts);
         ts = get_timestamp_as_string();
-        printf("attempting to connect() <ts: %s>", ts);
+        printf("attempting to connect() <ts: %s>\n", ts);
     }
 
     free(ts);
     ts = get_timestamp_as_string();
-    printf("connection successful <ts: %s>", ts);
+    printf("connection successful <ts: %s>\n", ts);
 
     return client_sockfd;
 }
@@ -238,17 +238,17 @@ main(int argc, char *argv[]) {
 
     // **** Connect client ****
     char *b1 = get_timestamp_as_string();
-    printf("calling connect_client() <ts: %s>", b1);
+    printf("calling connect_client() <ts: %s>\n", b1);
     int client_sockfd = connect_client();
     char *b1_b = get_timestamp_as_string();
-    printf("returned from connect_client() <ts: %s>", b1_b);
+    printf("returned from connect_client() <ts: %s>\n", b1_b);
 
     // **** Send data [string or file] ****
     char *b2 = get_timestamp_as_string();
-    printf("calling transmit() <ts: %s>", b2);
+    printf("calling transmit() <ts: %s>\n", b2);
     transmit(client_sockfd);
     char *b2_b = get_timestamp_as_string();
-    printf("returned from transmit() <ts: %s>", b2_b);
+    printf("returned from transmit() <ts: %s>\n", b2_b);
 
     // **** Close the connection gracefully ****
     cleanup(client_sockfd);
