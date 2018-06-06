@@ -564,6 +564,8 @@ struct hostapd_bss_config {
 
 	struct wpabuf *vendor_elements;
 	struct wpabuf *assocresp_elements;
+	// IE for beacon stuffing.
+	struct wpabuf *beacon_stuff_ie;
 
 	unsigned int sae_anti_clogging_threshold;
 	int *sae_groups;
