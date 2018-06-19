@@ -1,3 +1,5 @@
+#!python3.6
+
 import os
 import subprocess
 
@@ -81,23 +83,18 @@ def make(ndk_home, output_dir, _api_list, _stl_list, _arch_list):
 
 			for _arch in _arch_list:
 				_arch_dir = os.path.join(_stl_dir, "{:s}".format(_arch))
-				os.mkdir(_arch_dir)
 
-				command = "python {:s}/build/tools/make-standalone-toolchains.py --api {:d} --stl {:s} --arch {:s} " \
+				command = "python2.7 {:s}/build/tools/make_standalone_toolchain.py --api {:d} --stl {:s} --arch {:s} " \
 				          "--install-dir {:s}".format(str(ndk_home), _api, _stl, _arch, str(_arch_dir))
 
 				print("Running `{:s}`".format(command))
-				rc = subprocess.call(
+				output = subprocess.run(
 					args = command,
-					stdin = subprocess.PIPE,
-					stderr = subprocess.PIPE,
+					universal_newlines = True,
 					shell = True
 				)
-				print("Return-Code: {:d}".format(rc))
-				print()
-
-				if rc != 0:
-					os.rmdir(_arch_dir)
+				print("Return-Code: {:d}".format(output.returncode))
+				print("")
 
 	pass
 
@@ -109,8 +106,18 @@ if __name__ == '__main__':
 	# Sanitize
 	# ndk-home
 	arguments.ndk_home = os.path.abspath(arguments.ndk_home)
+	if not os.path.exists(arguments.ndk_home):
+		print("The ndk-home does not exist!")
+		exit(1)
+
 	# output-dir
 	arguments.output_dir = os.path.abspath(arguments.output_dir)
+	if os.path.exists(arguments.output_dir):
+		print("The output directory already exists!")
+		exit(2)
+	else:
+		os.mkdir(arguments.output_dir)
+
 	# api
 	api_list = list()
 	if arguments.api is not None:
