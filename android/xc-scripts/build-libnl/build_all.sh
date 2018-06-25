@@ -47,42 +47,42 @@ then
 	echo "--------------------------------------------------"
 fi
 
-# if [ -d "${TOOLCHAIN_HOME}/arm64" ]
-# then
-# 	echo "--------------------------------------------------"
-# 	echo "ARM64_V8A compilation starting!"
-# 	echo
+if [ -d "${TOOLCHAIN_HOME}/arm64" ]
+then
+	echo "--------------------------------------------------"
+	echo "ARM64_V8A compilation starting!"
+	echo
 
-# 	${SCRIPTPATH}/build_arm64_v8a.sh
+	${SCRIPTPATH}/build_arm64_v8a.sh
 
-# 	echo
-# 	echo "ARM64_V8A compilation complete!"
-# 	echo "--------------------------------------------------"
-# fi
+	echo
+	echo "ARM64_V8A compilation complete!"
+	echo "--------------------------------------------------"
+fi
 
-# if [ -d "${TOOLCHAIN_HOME}/x86" ]
-# then
-# 	echo "--------------------------------------------------"
-# 	echo "x86 compilation starting!"
-# 	echo
+if [ -d "${TOOLCHAIN_HOME}/x86" ]
+then
+	echo "--------------------------------------------------"
+	echo "x86 compilation starting!"
+	echo
 
-# 	${SCRIPTPATH}/build_x86.sh
+	${SCRIPTPATH}/build_x86.sh
 
-# 	echo
-# 	echo "x86 compilation complete!"
-# 	echo "--------------------------------------------------"
-# fi
+	echo
+	echo "x86 compilation complete!"
+	echo "--------------------------------------------------"
+fi
 
-# if [ -d "${TOOLCHAIN_HOME}/x86_64" ]
-# then
-# 	echo "--------------------------------------------------"
-# 	echo "X86_64 compilation starting!"
-# 	echo
+if [ -d "${TOOLCHAIN_HOME}/x86_64" ]
+then
+	echo "--------------------------------------------------"
+	echo "X86_64 compilation starting!"
+	echo
 
-# 	${SCRIPTPATH}/build_x86_64.sh
+	${SCRIPTPATH}/build_x86_64.sh
 
-# 	echo
-# 	echo "X86_64 compilation complete!"
-# 	echo "--------------------------------------------------"
-# fi
+	echo
+	echo "X86_64 compilation complete!"
+	echo "--------------------------------------------------"
+fi
 

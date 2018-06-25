@@ -67,6 +67,7 @@ export PKG_CONFIG_PATH=${TOOLCHAIN_ROOT}/lib/pkgconfig
 # *, C compiler flags
 export CFLAGS=""
 export CFLAGS="${CFLAGS} --sysroot=${SYSROOT}"
+# export CFLAGS="${CFLAGS} -fpic -fPIC -fpie -fPIE"
 export CFLAGS="${CFLAGS} -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb"
 
 # *, linker flags, e.g. -L<lib dir> 
