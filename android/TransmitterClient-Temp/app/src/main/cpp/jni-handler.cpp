@@ -7,7 +7,6 @@
 #include <cstring>
 #include <cstdio>
 #include <android/log.h>
-#include "headers.h"
 
 
 const char *android_log_tag = "jni-handler.cpp";
@@ -60,7 +59,7 @@ Java_com_gursimransinghhanspal_domf_1transmitterclient_activity_Main_setInformat
         __android_log_write(ANDROID_LOG_INFO, android_log_tag, buffer);
     }
 
-    driver(const_cast<char *>(interface_name), ie_data[0], 2);
+    // driver(const_cast<char *>(interface_name), ie_data[0], 2);
 
     // release memory
     env->ReleaseStringUTFChars(interface_name_jstring, interface_name);
