@@ -19,22 +19,22 @@ find_library(
 )
 
 # LIBNL
-#add_library(
-#    nl-3 STATIC IMPORTED
-#)
-#set_target_properties(
-#    nl-3 PROPERTIES
-#    IMPORTED_LOCATION ${distribution_DIR}/nl/lib/${ANDROID_ABI}/libnl-3.a
-#)
+add_library(
+    nl SHARED IMPORTED
+)
+set_target_properties(
+    nl PROPERTIES
+    IMPORTED_LOCATION ${distribution_DIR}/libnl/lib/${ANDROID_ABI}/libnl-3.so
+)
 
 # LIBNL-GENL
-#add_library(
-#    nl-genl-3 STATIC IMPORTED
-#)
-#set_target_properties(
-#    nl-genl-3 PROPERTIES
-#    IMPORTED_LOCATION ${distribution_DIR}/nl/lib/${ANDROID_ABI}/libnl-genl-3.a
-#)
+add_library(
+    genl SHARED IMPORTED
+)
+set_target_properties(
+    genl PROPERTIES
+    IMPORTED_LOCATION ${distribution_DIR}/libnl/lib/${ANDROID_ABI}/libnl-genl-3.so
+)
 
 # build application's shared lib
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
@@ -44,8 +44,15 @@ add_library(
     jni-handler SHARED src/main/cpp/jni-handler.cpp
 )
 #
+target_include_directories(
+    jni-handler PRIVATE
+    ${distribution_DIR}/libnl/include
+)
+#
 target_link_libraries(
     jni-handler
+    nl
+    genl
 #    driver
     android
     log

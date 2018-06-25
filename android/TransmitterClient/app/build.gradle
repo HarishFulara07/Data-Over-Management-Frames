@@ -13,6 +13,15 @@ android {
             cmake {
                 cppFlags "-std=c++14 -frtti -fexceptions"
             }
+            ndk {
+                abiFilters "armeabi-v7a"
+            }
+        }
+    }
+    sourceSets {
+        main {
+            // let gradle pack the shared library into apk
+            jniLibs.srcDirs = ['../distribution/libnl/lib']
         }
     }
     buildTypes {
