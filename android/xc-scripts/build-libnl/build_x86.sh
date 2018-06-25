@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# @author: Gursimran Singh
+# @github: https://github.com/gursimransinghhanspal
+# 
+# @reference:	1. https://gist.github.com/klynch/8192710
+# 				2. https://gist.github.com/nddrylliog/4688209
+#				3. https://github.com/RoyGuanyu/build-scripts-of-ffmpeg-x264-for-android-ndk
+# 				4. https://developer.android.com/ndk/guides/standalone_toolchain.html
+#
+# Cross Compile a library from source for x86
+
 
 # ----- ABI Specific Configuration -----
 
@@ -14,8 +24,8 @@ export TOOLCHAIN_BIN_PATH=${TOOLCHAIN_ROOT}/bin
 # the toolchain sysroot
 export SYSROOT=${TOOLCHAIN_ROOT}/sysroot
 
-# add toolchain binaries to system path (precautionary)
-export PATH=${PATH}:${TOOLCHAIN_BIN_PATH}
+# add toolchain binaries to system path (if not providing full paths to binaries) [messy way]
+# export PATH=${PATH}:${TOOLCHAIN_BIN_PATH}
 # -----
 
 
@@ -27,12 +37,15 @@ export PATH=${PATH}:${TOOLCHAIN_BIN_PATH}
 # others are extra, couldn't hurt
 
 # toolchain binaries
+export CC=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-gcc  				# *, C compiler command (gcc)
+# export CC=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-clang  			# *, C compiler command (clang)
 export CPP=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-cpp 				# *, C preprocessor
+
+export CXX=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-g++					# (g++)
+# export CXX=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-clang++			# (clang++)
 export AR=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-ar
 export AS=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-as
 export NM=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-nm
-export CC=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-gcc  				# *, C compiler command
-export CXX=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-g++
 export LD=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-ld
 export RANLIB=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-ranlib
 export STRIP=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-strip
@@ -52,31 +65,36 @@ export GPROF=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-gprof
 export PKG_CONFIG_PATH=${TOOLCHAIN_ROOT}/lib/pkgconfig
 
 # *, C compiler flags
-export CFLAGS="${CFLAGS} --sysroot=${SYSROOT} -I${SYSROOT}/usr/include -I${TOOLCHAIN_ROOT}/include"
+export CFLAGS=""
+export CFLAGS="${CFLAGS} --sysroot=${SYSROOT}"
 export CFLAGS="${CFLAGS} -fpic -fPIC -fpie -fPIE"
 export CFLAGS="${CFLAGS} -march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32"
 
-# *, 
+# *, linker flags, e.g. -L<lib dir> 
+export LDFLAGS=""
 export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib -L${TOOLCHAIN_ROOT}/lib"
 export LDFLAGS="${LDFLAGS} -pie"
 
-# *,
-export LIBS="${LIBS}"
+# *, libraries to pass to the linker, e.g. -l<library>
+# export LIBS="${LIBS}"
 
-# *,
-export CPPFLAGS="${CPPFLAGS} ${CFLAGS}"
+# *, (Objective) C/C++ preprocessor flags, e.g. -I<include dir>
+export CPPFLAGS=""
+export CPPFLAGS="${CPPFLAGS} -I${SYSROOT}/usr/include -I${TOOLCHAIN_ROOT}/include"
 
 # *,  path to pkg-config utility
-export PKG_CONFIG="${PKG_CONFIG}"
+# export PKG_CONFIG="${PKG_CONFIG}"
 
 # *, path overriding pkg-config's built-in search path
-export PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR}"
+# if not overridden with sysroot path, default libraries and packages will be included in search path
+# so either copy ${PKG_CONFIG_PATH} or leave empty
+export PKG_CONFIG_LIBDIR="${PKG_CONFIG_PATH}"
 
+# We won't be using `make check`! Leave these be
 # *, C compiler flags for CHECK, overriding pkg-config
-export CHECK_CFLAGS="${CHECK_CFLAGS}"
-
+# export CHECK_CFLAGS="${CHECK_CFLAGS}"
 # *, linker flags for CHECK, overriding pkg-config
-export CHECK_LIBS="${CHECK_LIBS}"
+# export CHECK_LIBS="${CHECK_LIBS}"
 # -----
 
 
@@ -84,6 +102,7 @@ export CHECK_LIBS="${CHECK_LIBS}"
 
 # the installation directory
 export PREFIX=${INSTALL_DIR}/${TARGET_ABI}
+mkdir ${PREFIX}
 # -----
 
 
@@ -107,8 +126,8 @@ make clean
 	--prefix=${PREFIX} \
 	--host=${TARGET_HOST} \
 	--disable-cli \
-	# --disable-pthreads \
-	# --disable-debug \
+	--disable-pthreads \
+	--disable-debug \
 	# "$0"
 
 # build
