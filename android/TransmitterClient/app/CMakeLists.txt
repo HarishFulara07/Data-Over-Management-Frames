@@ -20,20 +20,20 @@ find_library(
 
 # LIBNL
 add_library(
-    nl SHARED IMPORTED
+    nl STATIC IMPORTED
 )
 set_target_properties(
     nl PROPERTIES
-    IMPORTED_LOCATION ${distribution_DIR}/libnl/lib/${ANDROID_ABI}/libnl-3.so
+    IMPORTED_LOCATION ${distribution_DIR}/libnl/lib/${ANDROID_ABI}/libnl-3.a
 )
 
 # LIBNL-GENL
 add_library(
-    genl SHARED IMPORTED
+    genl STATIC IMPORTED
 )
 set_target_properties(
     genl PROPERTIES
-    IMPORTED_LOCATION ${distribution_DIR}/libnl/lib/${ANDROID_ABI}/libnl-genl-3.so
+    IMPORTED_LOCATION ${distribution_DIR}/libnl/lib/${ANDROID_ABI}/libnl-genl-3.a
 )
 
 # build application's shared lib
