@@ -67,14 +67,14 @@ export PKG_CONFIG_PATH=${TOOLCHAIN_ROOT}/lib/pkgconfig
 # *, C compiler flags
 export CFLAGS=""
 export CFLAGS="${CFLAGS} --sysroot=${SYSROOT}"
-export CFLAGS="${CFLAGS} -fpic -fPIC -fpie -fPIE"
+export CFLAGS="${CFLAGS} -fPIC"
 export CFLAGS="${CFLAGS} -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb"
 
 # *, linker flags, e.g. -L<lib dir> 
 export LDFLAGS=""
 export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib -L${TOOLCHAIN_ROOT}/lib"
-export LDFLAGS="${LDFLAGS} -pie -nostdlib"
-export LDFLAGS="${LDFLAGS} -march=armv7-a -Wl,--fix-cortex-a8"
+export LDFLAGS="${LDFLAGS} -fPIC"
+export LDFLAGS="${LDFLAGS} -march=armv7-a -Wl,--fix-cortex-a8 -Wl,-Bsymbolic"
 
 # *, libraries to pass to the linker, e.g. -l<library>
 # export LIBS="${LIBS}"

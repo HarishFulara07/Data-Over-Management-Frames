@@ -1,0 +1,8 @@
+//
+// Created by gursimran on 25/6/18.
+//
+
+#ifndef TRANSMITTERCLIENT_UTILITY_H
+#define TRANSMITTERCLIENT_UTILITY_H
+
+#endif //TRANSMITTERCLIENT_UTILITY_H

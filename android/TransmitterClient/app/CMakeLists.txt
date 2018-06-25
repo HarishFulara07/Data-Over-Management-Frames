@@ -90,23 +90,23 @@ target_link_libraries(
 )
 
 # UTILITY
-#add_library(
-#    utility SHARED src/main/cpp/utility.c
-#)
+add_library(
+    utility SHARED src/main/cpp/utility.c
+)
 #
-#target_include_directories(
-#    utility PRIVATE
-#    ${distribution_DIR}/libnl/include
-#)
+target_include_directories(
+    utility PRIVATE
+    ${distribution_DIR}/libnl/include
+)
 #
-#target_link_libraries(
-#    utility
-#    callbacks
-#    nl
-#    genl
-#    android
-#    log
-#)
+target_link_libraries(
+    utility
+    callbacks
+    nl
+    genl
+    android
+    log
+)
 
 #
 target_include_directories(jni-handler PRIVATE)
