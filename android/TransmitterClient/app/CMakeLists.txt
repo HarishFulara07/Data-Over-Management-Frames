@@ -56,7 +56,7 @@ target_link_libraries(
     jni-handler
     nl
     genl
-#    driver
+    driver
     android
     log
 )
