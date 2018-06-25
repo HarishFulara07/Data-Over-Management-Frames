@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include <android/log.h>
+#include <net/if.h>
 
 /*
  * Define structures to be used in the code.
@@ -76,7 +77,7 @@ char **split_data(char *, int);
 int get_n_ies_reqd(size_t);
 
 
-// Probe stuffing fuction.
+// Probe stuffing function.
 int do_probe_stuffing(struct nl_sock *, int, int, int, unsigned char *);
 
 

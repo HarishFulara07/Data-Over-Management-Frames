@@ -22,6 +22,7 @@ find_library(
 add_library(
     nl STATIC IMPORTED
 )
+#
 set_target_properties(
     nl PROPERTIES
     IMPORTED_LOCATION ${distribution_DIR}/libnl/lib/${ANDROID_ABI}/libnl-3.a
@@ -31,10 +32,12 @@ set_target_properties(
 add_library(
     genl STATIC IMPORTED
 )
+#
 set_target_properties(
     genl PROPERTIES
     IMPORTED_LOCATION ${distribution_DIR}/libnl/lib/${ANDROID_ABI}/libnl-genl-3.a
 )
+
 
 # build application's shared lib
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
@@ -59,17 +62,22 @@ target_link_libraries(
 )
 
 # DRIVER
-#add_library(
-#    driver SHARED driver.cpp
-#)
+add_library(
+    driver SHARED src/main/cpp/driver.c
+)
 #
-#target_link_libraries(
-#    driver
-#    nl-callbacks
-#    utility
-#    android
-#    log
-#)
+target_include_directories(
+    driver PRIVATE
+    ${distribution_DIR}/libnl/include
+)
+#
+target_link_libraries(
+    driver
+    callbacks
+    utility
+    android
+    log
+)
 
 # CALLBACKS
 add_library(
@@ -104,8 +112,6 @@ target_link_libraries(
     callbacks
     nl
     genl
-    android
-    log
 )
 
 #
