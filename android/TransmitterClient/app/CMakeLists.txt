@@ -54,8 +54,6 @@ target_include_directories(
 #
 target_link_libraries(
     jni-handler
-    nl
-    genl
     driver
     android
     log
@@ -63,7 +61,7 @@ target_link_libraries(
 
 # DRIVER
 add_library(
-    driver SHARED src/main/cpp/driver.c
+    driver SHARED src/main/cpp/driver.cpp
 )
 #
 target_include_directories(
@@ -81,7 +79,7 @@ target_link_libraries(
 
 # CALLBACKS
 add_library(
-    callbacks SHARED src/main/cpp/callbacks.c
+    callbacks SHARED src/main/cpp/callbacks.cpp
 )
 #
 target_include_directories(
@@ -99,7 +97,7 @@ target_link_libraries(
 
 # UTILITY
 add_library(
-    utility SHARED src/main/cpp/utility.c
+    utility SHARED src/main/cpp/utility.cpp
 )
 #
 target_include_directories(

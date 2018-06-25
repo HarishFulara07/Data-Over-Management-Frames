@@ -126,7 +126,7 @@ char *extract_ack_from_vendor_ie(unsigned char len, unsigned char *data) {
 // This function will be called by the kernel with a dump
 // of the successful scan's data. Called for each SSID.
 int get_ack(struct nl_msg *msg, void *arg) {
-    struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
+    struct genlmsghdr *gnlh = static_cast<genlmsghdr *>(nlmsg_data(nlmsg_hdr(msg)));
     struct nlattr *tb[NL80211_ATTR_MAX + 1];
     struct nlattr *bss[NL80211_BSS_MAX + 1];
     static struct nla_policy bss_policy[NL80211_BSS_MAX + 1] = {
@@ -162,14 +162,14 @@ int get_ack(struct nl_msg *msg, void *arg) {
 
     // Extract out the IEs.
     if (bss[NL80211_BSS_INFORMATION_ELEMENTS]) {
-        unsigned char *ies = nla_data(bss[NL80211_BSS_INFORMATION_ELEMENTS]);
+        unsigned char *ies = static_cast<unsigned char *>(nla_data(bss[NL80211_BSS_INFORMATION_ELEMENTS]));
         int ies_len = nla_len(bss[NL80211_BSS_INFORMATION_ELEMENTS]);
 
         while (ies_len >= 2 && ies_len >= ies[1]) {
             // Vendor Specific IE.
             if (ies[0] == 221) {
                 char *ack_seq_num_str = extract_ack_from_vendor_ie(ies[1], ies + 2);
-                int *ack_seq_num = arg;
+                int *ack_seq_num = static_cast<int *>(arg);
                 if (ack_seq_num_str) {
                     *ack_seq_num = atoi(ack_seq_num_str);
                     free(ack_seq_num_str);

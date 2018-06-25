@@ -3,17 +3,12 @@
 //
 
 //#include "driver.h"
-#include <string.h>
-#include <malloc.h>
-#include <strings.h>
 #include "probe_stuffing.h"
 
 const char LOG_TAG[] = "driver.c";
 char LOG_BUFFER[256];
 
 int driver(char *wifi_interface, char *data_to_stuff, int effort) {
-
-    int opt;
 
     /**
      * Reading command line parameters.

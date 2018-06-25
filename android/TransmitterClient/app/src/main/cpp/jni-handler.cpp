@@ -42,7 +42,7 @@ Java_com_gursimransinghhanspal_transmitterclient_MainActivity_setInformationElem
     snprintf(buffer, buffer_sz, "effort: %d", effort);
     __android_log_write(ANDROID_LOG_INFO, "jni-handler.c", buffer);
 
-    // driver(const_cast<char *>(interface_name), ie_data[0], 2);
+    driver(const_cast<char *>(interface_name), const_cast<char *>(ie_data), effort);
 
     // release memory
     env->ReleaseStringUTFChars(_interfaceName, interface_name);
