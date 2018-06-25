@@ -71,29 +71,39 @@ target_link_libraries(
 #    log
 #)
 
-# NL-CALLBACKS
-#add_library(
-#    nl-callbacks SHARED nl-callbacks.cpp
-#)
+# CALLBACKS
+add_library(
+    callbacks SHARED src/main/cpp/callbacks.c
+)
 #
-#target_link_libraries(
-#    nl-callbacks
-#    nl-3
-#    nl-genl-3
-#    android
-#    log
-#)
+target_include_directories(
+    callbacks PRIVATE
+    ${distribution_DIR}/libnl/include
+)
+#
+target_link_libraries(
+    callbacks
+    nl
+    genl
+    android
+    log
+)
 
 # UTILITY
 #add_library(
-#    utility SHARED utility.cpp
+#    utility SHARED src/main/cpp/utility.c
+#)
+#
+#target_include_directories(
+#    utility PRIVATE
+#    ${distribution_DIR}/libnl/include
 #)
 #
 #target_link_libraries(
 #    utility
-#    nl-callbacks
-#    nl-3
-#    nl-genl-3
+#    callbacks
+#    nl
+#    genl
 #    android
 #    log
 #)

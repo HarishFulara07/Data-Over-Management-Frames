@@ -37,12 +37,12 @@ export SYSROOT=${TOOLCHAIN_ROOT}/sysroot
 # others are extra, couldn't hurt
 
 # toolchain binaries
-export CC=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-gcc  				# *, C compiler command (gcc)
-# export CC=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-clang  			# *, C compiler command (clang)
+# export CC=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-gcc  				# *, C compiler command (gcc)
+export CC=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-clang  			# *, C compiler command (clang)
 export CPP=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-cpp 				# *, C preprocessor
 
-export CXX=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-g++					# (g++)
-# export CXX=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-clang++			# (clang++)
+# export CXX=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-g++					# (g++)
+export CXX=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-clang++			# (clang++)
 export AR=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-ar
 export AS=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-as
 export NM=${TOOLCHAIN_BIN_PATH}/${TARGET_HOST}-nm
@@ -73,7 +73,7 @@ export CFLAGS="${CFLAGS} -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthu
 # *, linker flags, e.g. -L<lib dir> 
 export LDFLAGS=""
 export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib -L${TOOLCHAIN_ROOT}/lib"
-export LDFLAGS="${LDFLAGS} -pie"
+export LDFLAGS="${LDFLAGS} -pie -nostdlib"
 export LDFLAGS="${LDFLAGS} -march=armv7-a -Wl,--fix-cortex-a8"
 
 # *, libraries to pass to the linker, e.g. -l<library>

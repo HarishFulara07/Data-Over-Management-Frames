@@ -1,0 +1,8 @@
+//
+// Created by gursimran on 25/6/18.
+//
+
+#ifndef TRANSMITTERCLIENT_CALLBACKS_H
+#define TRANSMITTERCLIENT_CALLBACKS_H
+
+#endif //TRANSMITTERCLIENT_CALLBACKS_H
