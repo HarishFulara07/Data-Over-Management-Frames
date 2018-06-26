@@ -44,6 +44,10 @@ int driver(char *wifi_interface, char *data_to_stuff, int effort) {
     }
 
     int interface_index = if_nametoindex(wifi_interface);
+	bzero(LOG_BUFFER, 256);
+	snprintf(LOG_BUFFER, 256, "driver(): Interface Index %d", interface_index);
+	__android_log_write(ANDROID_LOG_INFO, LOG_TAG, LOG_BUFFER);
+
     int driver_id;
     struct nl_sock *socket = NULL;
 
@@ -63,7 +67,7 @@ int driver(char *wifi_interface, char *data_to_stuff, int effort) {
     int ack_retries_left = 4;
 
     // How much data we need to stuff inside PReq frames.
-    int len_data_to_stuff = strlen(data_to_stuff);
+    int len_data_to_stuff = static_cast<int>(strlen(data_to_stuff));
     // How much data we have already stuffed inside PReq frames.
     int len_data_already_stuffed = 0;
 
@@ -130,6 +134,9 @@ int driver(char *wifi_interface, char *data_to_stuff, int effort) {
         socket = init_socket();
         // Find the nl80211 driver ID.
         driver_id = genl_ctrl_resolve(socket, "nl80211");
+	    bzero(LOG_BUFFER, 256);
+	    snprintf(LOG_BUFFER, 256, "driver(): Driver Id %d", driver_id);
+	    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, LOG_BUFFER);
 
         // Number of IEs we will need to stuff the data.
         int n_ies = get_n_ies_reqd(strlen(data));
@@ -160,7 +167,7 @@ int driver(char *wifi_interface, char *data_to_stuff, int effort) {
 
         // Divide the data into 252 bytes chunks.
         char **raw_ies_data = split_data(data, n_ies);
-        data_size = strlen(data);
+        data_size = static_cast<int>(strlen(data));
         free(data);
 
         for (int i = 1; i < n_ies + 1; ++i) {
@@ -204,7 +211,8 @@ int driver(char *wifi_interface, char *data_to_stuff, int effort) {
             __android_log_write(ANDROID_LOG_INFO, LOG_TAG, LOG_BUFFER);
 
             // Issue NL80211_CMD_TRIGGER_SCAN to the kernel and wait for it to finish.
-            int err = do_probe_stuffing(socket, interface_index, driver_id, ies_len, ies_data);
+            int err = do_probe_stuffing(socket, interface_index, driver_id,
+                                        static_cast<int>(ies_len), ies_data);
 
             if (err != 0) {
                 // Scanning failed.
@@ -276,7 +284,7 @@ int driver(char *wifi_interface, char *data_to_stuff, int effort) {
                     } else {
                         // Don't retry for best delivery effort.
                         __android_log_write(ANDROID_LOG_INFO, LOG_TAG,
-                                            "Will not retry since it is best delivery effort...");
+                                            "driver(): Will not retry since it is best delivery effort...");
                         seq_num += 1;
                         break;
                     }
@@ -296,7 +304,7 @@ int driver(char *wifi_interface, char *data_to_stuff, int effort) {
                         if (effort == 2) {
                             ack_retries_left--;
                             __android_log_write(ANDROID_LOG_ERROR, LOG_TAG,
-                                                "Invalid received ACK.");
+                                                "driver(): Invalid received ACK.");
 
                             if (ack_retries_left > 0) {
                                 nl_socket_free(socket);
@@ -316,16 +324,16 @@ int driver(char *wifi_interface, char *data_to_stuff, int effort) {
                         } else {
                             // Don't retry for best delivery effort.
                             __android_log_write(ANDROID_LOG_INFO, LOG_TAG,
-                                                "Will not retry since it is best delivery effort...");
+                                                "driver(): Will not retry since it is best delivery effort...");
                             seq_num += 1;
                             break;
                         }
                     } else {
                         // Everything went well. Scan and ACK flow completed.
                         __android_log_write(ANDROID_LOG_INFO, LOG_TAG,
-                                            "ACK received successfully.");
+                                            "driver(): ACK received successfully.");
                         __android_log_write(ANDROID_LOG_INFO, LOG_TAG,
-                                            "Waiting for 15s before sending more data.");
+                                            "driver(): Waiting for 15s before sending more data.");
 
                         seq_num += 1;
                         free(ies_data);
@@ -338,17 +346,17 @@ int driver(char *wifi_interface, char *data_to_stuff, int effort) {
 
         if (scan_retries_left == 0) {
             __android_log_write(ANDROID_LOG_INFO, LOG_TAG,
-                                "No more retries left for scanning. Exiting...");
+                                "driver(): No more retries left for scanning. Exiting...");
             break;
         } else if (ack_retries_left == 0) {
             __android_log_write(ANDROID_LOG_INFO, LOG_TAG,
-                                "No more retries left for getting ACK from an AP. Exiting...");
+                                "driver(): No more retries left for getting ACK from an AP. Exiting...");
             break;
         } else {
             // Everything went well :)
             // Sleep for 10 seconds before sending more data.
             __android_log_write(ANDROID_LOG_INFO, LOG_TAG,
-                                "Going to sleep for 15s before sending new scan request.");
+                                "driver(): Going to sleep for 15s before sending new scan request.");
 
             if (len_data_already_stuffed != len_data_to_stuff) {
                 sleep(15);
@@ -446,12 +454,13 @@ int do_probe_stuffing(struct nl_sock *socket, int interface_index,
              "do_probe_stuffing(): NL80211_CMD_TRIGGER_SCAN sent %d bytes to the kernel.",
              ret);
     __android_log_write(ANDROID_LOG_INFO, LOG_TAG, LOG_BUFFER);
-    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "Broadcasting stuffed probe request frames.");
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "do_probe_stuffing(): Broadcasting stuffed probe request frames.");
 
-    while (err > 0) {
-        // First wait for ack_handler(). This helps with basic errors.
-        ret = nl_recvmsgs(socket, cb);
-    }
+//    while (err > 0) {
+//        // First wait for ack_handler(). This helps with basic errors.
+//        __android_log_write(ANDROID_LOG_WARN, LOG_TAG, "do_probe_stuffing(): waiting for ack handler!");
+//        ret = nl_recvmsgs(socket, cb);
+//    }
 
     if (err < 0) {
         bzero(LOG_BUFFER, 256);

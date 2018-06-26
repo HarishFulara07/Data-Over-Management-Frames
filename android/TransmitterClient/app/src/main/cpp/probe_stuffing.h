@@ -5,6 +5,11 @@
 #ifndef TRANSMITTERCLIENT_PROBE_STUFFING_H
 #define TRANSMITTERCLIENT_PROBE_STUFFING_H
 
+#ifdef __cplusplus
+// tells the compiler that we are using C headers
+extern "C" {
+#endif
+
 /*
  * Include libraries.
  */
@@ -83,5 +88,9 @@ int get_n_ies_reqd(size_t);
 int do_probe_stuffing(struct nl_sock *, int, int, int, unsigned char *);
 
 int driver(char *, char *, int);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //TRANSMITTERCLIENT_PROBE_STUFFING_H

@@ -7,7 +7,6 @@
  * NL80211 callback functions.
  */
 
-//#include "callbacks.h"
 #include "probe_stuffing.h"
 
 
@@ -54,27 +53,31 @@ int family_handler(struct nl_msg *msg, void *arg) {
 
     if (!tb[CTRL_ATTR_MCAST_GROUPS]) return NL_SKIP;
 
-    // @gursimran: Cannot solve this error! So commenting it out
-    /*
-    nla_for_each_nested(mcgrp, tb[CTRL_ATTR_MCAST_GROUPS], rem_mcgrp) {
+    // @gursimran: compiler cannot use the #define constant
+    //             so using it directly here
+    /* nla_for_each_nested(mcgrp, tb[CTRL_ATTR_MCAST_GROUPS], rem_mcgrp) { */
+    for (mcgrp = static_cast<const nlattr *>(nla_data(
+            tb[CTRL_ATTR_MCAST_GROUPS])), rem_mcgrp = nla_len(tb[CTRL_ATTR_MCAST_GROUPS]); \
+         nla_ok(mcgrp, rem_mcgrp); \
+         mcgrp = nla_next(mcgrp, &(rem_mcgrp))) {
         struct nlattr *tb_mcgrp[CTRL_ATTR_MCAST_GRP_MAX + 1];
 
         nla_parse(tb_mcgrp, CTRL_ATTR_MCAST_GRP_MAX,
-                  static_cast<nlattr *>(nla_data(static_cast<const nlattr *>(mcgrp))), nla_len(
-                        static_cast<const nlattr *>(mcgrp)), NULL);
+                  static_cast<nlattr *>(nla_data(mcgrp)), nla_len(
+                        mcgrp), NULL);
 
         if (!tb_mcgrp[CTRL_ATTR_MCAST_GRP_NAME]
             || !tb_mcgrp[CTRL_ATTR_MCAST_GRP_ID])
             continue;
 
-        if (strncmp(static_cast<const char *>(nla_data(tb_mcgrp[CTRL_ATTR_MCAST_GRP_NAME])), grp->group, (size_t) nla_len(tb_mcgrp[CTRL_ATTR_MCAST_GRP_NAME]))) {
+        if (strncmp(static_cast<const char *>(nla_data(tb_mcgrp[CTRL_ATTR_MCAST_GRP_NAME])),
+                    grp->group, (size_t) nla_len(tb_mcgrp[CTRL_ATTR_MCAST_GRP_NAME]))) {
             continue;
         }
 
         grp->id = nla_get_u32(tb_mcgrp[CTRL_ATTR_MCAST_GRP_ID]);
         break;
     }
-    */
 
     return NL_SKIP;
 }
@@ -85,7 +88,8 @@ int callback_trigger(struct nl_msg *msg, void *arg) {
     struct trigger_results *results = static_cast<trigger_results *>(arg);
 
     if (gnlh->cmd == NL80211_CMD_SCAN_ABORTED) {
-        __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "callback_trigger(): NL80211_CMD_SCAN_ABORTED");
+        __android_log_write(ANDROID_LOG_INFO, LOG_TAG,
+                            "callback_trigger(): NL80211_CMD_SCAN_ABORTED");
         results->done = 1;
         results->aborted = 1;
     } else if (gnlh->cmd == NL80211_CMD_NEW_SCAN_RESULTS) {

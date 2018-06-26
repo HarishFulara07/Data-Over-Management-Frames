@@ -185,7 +185,7 @@ int get_ack(struct nl_msg *msg, void *arg) {
 
 // Divide data into chunks of 252 bytes.
 char **split_data(char *data, int n_ies) {
-    int len = strlen(data);
+    int len = static_cast<int>(strlen(data));
     int i;
     char **raw_ies_data = (char **) calloc((size_t) n_ies, (sizeof(char **)));
 
@@ -204,8 +204,8 @@ char **split_data(char *data, int n_ies) {
 // Get number of IEs required.
 int get_n_ies_reqd(size_t len_data_to_stuff) {
     if (len_data_to_stuff % 252 == 0) {
-        return (len_data_to_stuff / 252);
+        return static_cast<int>(len_data_to_stuff / 252);
     } else {
-        return (len_data_to_stuff / 252) + 1;
+        return static_cast<int>((len_data_to_stuff / 252) + 1);
     }
 }
