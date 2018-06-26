@@ -12,14 +12,14 @@
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/resLayout_activityMain_titleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="24dp"
                 android:fontFamily="sans-serif-condensed"
                 android:gravity="center"
                 android:text="Prepare Information Elements"
@@ -29,98 +29,78 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:targetApi="jelly_bean"
                 tools:ignore="HardcodedText" />
 
             <TextView
-                android:id="@+id/resLayout_activityMain_ieCountLabel"
+                android:id="@+id/resLayout_activityMain_deliveryModeLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
                 android:fontFamily="sans-serif-condensed"
                 android:gravity="start"
-                android:text="Info Element Count:"
+                android:text="Delivery Mode"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/resLayout_activityMain_ieCountSpinner"
-                app:layout_constraintEnd_toStartOf="@+id/resLayout_activityMain_ieCountSpinner"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/resLayout_activityMain_ieCountSpinner"
-                tools:targetApi="jelly_bean" />
-
-            <LinearLayout
-                android:id="@+id/resLayout_activityMain_ieCountSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toEndOf="@+id/resLayout_activityMain_ieCountLabel"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/resLayout_activityMain_titleTextView"
-                tools:ignore="RtlHardcoded">
+                tools:ignore="HardcodedText" />
 
-                <ImageButton
-                    android:id="@+id/resLayout_activityMain_ieCountSpinner_decButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/colorAccent"
-                    app:srcCompat="@drawable/ic_keyboard_arrow_left_white_24dp"
-                    tools:targetApi="lollipop" />
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/resLayout_activityMain_guaranteedDelivery_switch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:checked="true"
+                android:fontFamily="sans-serif-condensed"
+                android:text="Guaranteed"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/resLayout_activityMain_deliveryModeLabel"
+                app:layout_constraintTop_toBottomOf="@+id/resLayout_activityMain_deliveryModeLabel"
+                tools:ignore="HardcodedText" />
 
-                <EditText
-                    android:id="@+id/resLayout_activityMain_ieCountInput"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginStart="4dp"
-                    android:fontFamily="sans-serif-condensed"
-                    android:gravity="center"
-                    android:inputType="numberDecimal"
-                    android:maxEms="5"
-                    android:minEms="2"
-                    android:text="2"
-                    android:textSize="16sp"
-                    tools:targetApi="jelly_bean"
-                    tools:ignore="HardcodedText" />
-
-                <ImageButton
-                    android:id="@+id/resLayout_activityMain_ieCountSpinner_incButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/colorAccent"
-                    app:srcCompat="@drawable/ic_keyboard_arrow_right_white_24dp"
-                    tools:targetApi="lollipop" />
-
-            </LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/resLayout_activityMain_oneTimeBroadcast_switch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif-condensed"
+                android:text="One time Broadcast"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/resLayout_activityMain_deliveryModeLabel"
+                app:layout_constraintTop_toBottomOf="@+id/resLayout_activityMain_guaranteedDelivery_switch"
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/resLayout_activityMain_ieDataLabel"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-condensed"
                 android:gravity="start"
                 android:text="Enter Data for Info Element"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/resLayout_activityMain_ieDataInput"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/resLayout_activityMain_ieCountSpinner" />
+                app:layout_constraintTop_toBottomOf="@+id/resLayout_activityMain_oneTimeBroadcast_switch"
+                tools:ignore="HardcodedText" />
 
             <EditText
                 android:id="@+id/resLayout_activityMain_ieDataInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:ems="10"
                 android:fontFamily="sans-serif-condensed"
@@ -130,36 +110,37 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/resLayout_activityMain_ieDataLabel"
                 app:layout_constraintTop_toBottomOf="@+id/resLayout_activityMain_ieDataLabel"
-                tools:targetApi="jelly_bean" />
+                tools:ignore="HardcodedText" />
 
 
             <LinearLayout
                 android:id="@+id/resLayout_activityMain_outputTerminal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="40dp"
                 android:background="@android:color/black"
                 android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/resLayout_activityMain_ieDataInput">
+                app:layout_constraintTop_toBottomOf="@+id/resLayout_activityMain_ieDataInput">
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center"
-                    android:text="Log"
+                    android:text="Logs"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -167,7 +148,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/resLayout_activityMain_ieCountSpinner" />
+                    app:layout_constraintTop_toBottomOf="@+id/resLayout_activityMain_ieCountSpinner"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/resLayout_activityMain_outputLog"
@@ -178,7 +160,6 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_weight="1"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="start"
                     android:textColor="@android:color/white"

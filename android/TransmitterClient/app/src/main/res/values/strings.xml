@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Transmitter Client</string>
+    <string name="info_element_count">Info Element Count:</string>
 </resources>
