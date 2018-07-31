@@ -78,7 +78,7 @@ db_callback(void *NotUsed, int argc, char **argv, char **azColName) {
 }
 
 void
-process_and_save(uint64_t con_ts, char *string, sqlite3 *db) {
+process_and_save(int sd, uint64_t con_ts, char *string, sqlite3 *db) {
 
 	/* ************************************************************************
 	 * expected format:
@@ -113,11 +113,27 @@ process_and_save(uint64_t con_ts, char *string, sqlite3 *db) {
                                      "data" \
                                      ") " \
                                      "VALUES('%s', %s, %s, %018llu, %s, %s, %s, %s, '%s');";
-	char sql_insert[1024];
-	snprintf(sql_insert, 1024, sql_insert_template,
+
+    char sql_insert[1024];
+
+    // if mac addr is not available, insert IP addr.
+    if (strcmp(split_str[1], "NA") == 0) {
+	    struct sockaddr_in client_addr;
+		socklen_t client_len;
+	    getpeername(sd, (struct sockaddr *) &client_addr, &client_len);
+		printf("Host disconnected , ip %s , port %d \n",
+		       inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
+		snprintf(sql_insert, 1024, sql_insert_template,
+	         DB_TABLE_NAME,
+	         split_str[0], inet_ntoa(client_addr.sin_addr), split_str[2], con_ts, split_str[3], split_str[4], split_str[5], split_str[6],
+	         split_str[7]);
+	} else {
+		snprintf(sql_insert, 1024, sql_insert_template,
 	         DB_TABLE_NAME,
 	         split_str[0], split_str[1], split_str[2], con_ts, split_str[3], split_str[4], split_str[5], split_str[6],
 	         split_str[7]);
+	}
 
 	char *db_err_msg = NULL;
 	int rc = sqlite3_exec(db, sql_insert, db_callback, NULL, &db_err_msg);
@@ -333,7 +349,7 @@ run_server(int server_sockfd, sqlite3 *db) {
 						uint64_t con_ts = tv.tv_sec * (uint64_t) 1000000 + tv.tv_usec;
 
 						printf("Received Data: %s\n", data);
-						process_and_save(con_ts, data, db);
+						process_and_save(sd, con_ts, data, db);
 
 					} else if (strcmp(command, FIL) == 0) {
 
