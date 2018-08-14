@@ -27,7 +27,7 @@ char *gen_rand_string() {
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			"abcdefghijklmnopqrstuvwxyz";
 
-	srand(time(NULL));
+	srand((time(NULL) + getpid()) % 105943);
 	char *s = (char *) calloc(ARG_BYTES +1, sizeof(char));
 	for (int i = 0; i < ARG_BYTES; ++i) {
 		s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
