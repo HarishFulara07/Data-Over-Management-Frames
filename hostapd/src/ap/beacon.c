@@ -1202,7 +1202,7 @@ int ieee802_11_build_ap_params(struct hostapd_data *hapd,
 		os_memcpy(tailpos, wpabuf_head(hapd->conf->beacon_stuff_ie),
 			  wpabuf_len(hapd->conf->beacon_stuff_ie));
 		tailpos += wpabuf_len(hapd->conf->beacon_stuff_ie);
-		printf("BEACON STUFFED.\n");	
+		printf("BEACON STUFFED.\n");
 	}
 
 	tail_len = tailpos > tail ? tailpos - tail : 0;
@@ -1396,11 +1396,11 @@ void create_beacon_stuffing_ie(struct hostapd_data *hapd, char *data_to_stuff) {
 	ie[2] = 1;
 	ie[3] = 2;
 	ie[4] = 3;
-	
-	for (int i = 5; i < ie_len - 5; ++i) {
+
+	for (int i = 5; i < ie_len; ++i) {
 		ie[i] = (unsigned char)data_to_stuff[i-5];
 	}
 
-	hapd->conf->beacon_stuff_ie = wpabuf_alloc(ie_len);
+    hapd->conf->beacon_stuff_ie = wpabuf_alloc(ie_len);
 	wpabuf_put_data(hapd->conf->beacon_stuff_ie, ie, ie_len);
 }

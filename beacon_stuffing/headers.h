@@ -1,0 +1,62 @@
+#ifndef HEADER
+#define HEADER
+
+/*
+ * Include libraries.
+ */
+#include <errno.h>
+#include <linux/nl80211.h>
+#include <netlink/errno.h>
+#include <netlink/genl/genl.h>
+#include <netlink/netlink.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <unistd.h>
+
+/*
+ * Define structures to be used in the code.
+ */
+
+// Results of triggering the scan.
+struct trigger_results {
+    int done;
+    int aborted;
+};
+
+// For family_handler() and nl_get_multicast_id().
+struct handler_args {
+    const char *group;
+    int id;
+};
+
+// For storing info about the IE.
+struct ie_info {
+	size_t ie_len;
+	unsigned char *ie_data;
+};
+
+/*
+ * Function prototypes.
+ */
+
+// Callback functions.
+int error_handler(struct sockaddr_nl *, struct nlmsgerr *, void *);
+int finish_handler(struct nl_msg *, void *);
+int ack_handler(struct nl_msg *, void *);
+int no_seq_check(struct nl_msg *, void *);
+int family_handler(struct nl_msg *, void *);
+int callback_trigger(struct nl_msg *, void *);
+
+// Utility functions.
+struct nl_sock * init_socket();
+int nl_get_multicast_id(struct nl_sock *, const char *, const char *);
+int get_beacon_info(struct nl_msg *, void *);
+
+// Probe stuffing fuction.
+int do_passive_scan(struct nl_sock *, int, int);
+
+// Main function.
+int if_nametoindex(char *);
+int genl_ctrl_resolve(struct nl_sock *, char *);
+
+#endif
