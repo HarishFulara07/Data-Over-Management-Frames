@@ -1299,6 +1299,20 @@ void ieee802_11_free_ap_params(struct wpa_driver_ap_params *params)
 }
 
 
+static char *rand_string(char *str, size_t size)
+{
+    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    if (size) {
+        --size;
+        for (size_t n = 0; n < size; n++) {
+            int key = rand() % (int) (sizeof charset - 1);
+            str[n] = charset[key];
+        }
+        str[size] = '\0';
+    }
+    return str;
+}
+
 int ieee802_11_set_beacon(struct hostapd_data *hapd)
 {
 	struct wpa_driver_ap_params params;
@@ -1315,8 +1329,9 @@ int ieee802_11_set_beacon(struct hostapd_data *hapd)
 
 	hapd->beacon_set_done = 1;
 
-	create_beacon_stuffing_ie(hapd, "Hello World!!! I am a stuffed IE inside beacon frame.");
-	if (ieee802_11_build_ap_params(hapd, &params) < 0)
+    create_beacon_stuffing_ie(hapd);
+
+    if (ieee802_11_build_ap_params(hapd, &params) < 0)
 		return -1;
 
 	if (hostapd_build_ap_extra_ies(hapd, &beacon, &proberesp, &assocresp) <
@@ -1384,11 +1399,15 @@ int ieee802_11_update_beacons(struct hostapd_iface *iface)
 
 #endif /* CONFIG_NATIVE_WINDOWS */
 
-void create_beacon_stuffing_ie(struct hostapd_data *hapd, char *data_to_stuff) {
+void create_beacon_stuffing_ie(struct hostapd_data *hapd) {
+    size_t data_len= 200;
+    char *data_to_stuff = malloc(sizeof(data_len));
+    rand_string(data_to_stuff, data_len);
+
 	size_t ie_len = 5 + strlen(data_to_stuff);
 	u8 *ie = (unsigned char *)malloc(ie_len);
 
-	// Vendor tag number.
+    // Vendor tag number.
 	ie[0] = 221;
 	// Size of IE.
 	ie[1] = ie_len - 2;
@@ -1401,6 +1420,11 @@ void create_beacon_stuffing_ie(struct hostapd_data *hapd, char *data_to_stuff) {
 		ie[i] = (unsigned char)data_to_stuff[i-5];
 	}
 
+    wpabuf_free(hapd->conf->beacon_stuff_ie);
     hapd->conf->beacon_stuff_ie = wpabuf_alloc(ie_len);
-	wpabuf_put_data(hapd->conf->beacon_stuff_ie, ie, ie_len);
+    if (hapd->conf->beacon_stuff_ie != NULL)
+        wpabuf_put_data(hapd->conf->beacon_stuff_ie, ie, ie_len);
+
+    free(data_to_stuff);
+    free(ie);
 }
