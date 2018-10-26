@@ -11,9 +11,9 @@ int main(int argc, char **argv) {
     char *data_to_stuff = NULL;
     char *file_path = NULL;
 
-    /* 
+    /*
      * Reading command line parameters.
-     * 
+     *
      * i = WiFi interface on which scan request will be sent. The data
      *     will be stuffed inside the PReq packets sent during the scan.
      * d = Data to stuff inside the IEs.
@@ -56,76 +56,84 @@ int main(int argc, char **argv) {
             printf("Error: Unable to read input file.\n");
             exit(EXIT_FAILURE);
         }
-    } else if (!data_to_stuff) { // Exit if client has not provided any data to stuff via CLI.
-        printf("Error: Invalid command line argument(s). Requires data "
-            "either from command line or from a file.\n");
-        exit(EXIT_FAILURE);
     }
+    // } else if (!data_to_stuff) { // Exit if client has not provided any data to stuff via CLI.
+    //     printf("Error: Invalid command line argument(s). Requires data "
+    //         "either from command line or from a file.\n");
+    //     exit(EXIT_FAILURE);
+    // }
 
-    printf("\n======================================\n");
     if (effort == 2) {
         printf("Effort: Guaranteed delivery\n");
     } else {
         printf("Effort: Best delivery\n");
     }
 
-    int interface_index = if_nametoindex(wifi_interface);
-    int driver_id;
-    struct nl_sock *socket = NULL;
-    
-    /*
-     * We are sequencing each PReq frame.
-     */
+    while(1) {
 
-    // Sequence number of the current PReq frame.
-    int seq_num = 0;
-    // Sequence number expected in PRes frame.
-    int ack_seq_num = -1;
-    // Retries left for sending a scan request.
-    // Each retry will occur after 15s.
-    int scan_retries_left = 4;
-    // Retries left for resending the PReq frame is wrong ACK is received.
-    // Each retry will occur after 15s.
-    int ack_retries_left = 4;
+        printf("\n======================================\n\n");
+        printf("Enter data to stuff: ");
+        data_to_stuff = (char*)malloc(200);
+        fflush(stdin);
+        fgets(data_to_stuff, 200, stdin);
 
-    // How much data we need to stuff inside PReq frames.
-    int len_data_to_stuff = strlen(data_to_stuff);
-    // How much data we have already stufed inside PReq frames.
-    int len_data_already_stuffed = 0;
-    /*
-     * We can stuff max 1452 bytes of IEs in a PReq frame.
-     * 
-     * Each IE can be max 256 bytes out of which 3 bytes are for
-     * OUI (Organizationally Unique Identifier), 1 byte for vendor specific type,
-     * and 252 bytes for data.
-     *
-     * IEs will be structured inside a PReq packet as follows:
-     *
-     * IE0 Data: Seq. Number | Timestamp | More Fragment Bit
-     * IE1...N Data: Data
-     * 
-     * We will reserve 9 bytes for Seq. Number, 19 bytes for Timestamp, and
-     * 2 bytes for More Fragment Bit, i.e. a total of 4 (reserved) + 9 + 19 + 2 = 34 bytes.
-     *
-     * So, the actual IEs (IE1...N) that contain the stuffed data can be 1452 - 34 = 1418 bytes.
-     * So, we need a min of floor(1418 / 256) + 1 = 6 IEs.
-     *
-     * So, the actual bytes availabe to stuff data = 1418 - (6 * 4) = 1394 bytes.
-     */
-    int ies_max_data_size = 1394;
+        int interface_index = if_nametoindex(wifi_interface);
+        int driver_id;
+        struct nl_sock *socket = NULL;
 
-    // Current Timestamp (in ms). This will be same for all the PReq frames.
-    struct timeval data_origin_tv;
-    gettimeofday(&data_origin_tv, NULL);
-    unsigned int data_origin_ts = (data_origin_tv.tv_sec);
-    unsigned int data_origin_ts_usec = (data_origin_tv.tv_usec);
-    char data_origin_ts_str[20];
-    sprintf(data_origin_ts_str, "%012u%06u", data_origin_ts, data_origin_ts_usec);
-    printf("Timestamp (in ms): %s\n", data_origin_ts_str);
-    printf("======================================\n");
+        /*
+         * We are sequencing each PReq frame.
+         */
 
-    // Continue untill we have no more data to stuff.
-    while (len_data_already_stuffed < len_data_to_stuff) {
+        // Sequence number of the current PReq frame.
+        int seq_num = 0;
+        // Sequence number expected in PRes frame.
+        int ack_seq_num = -1;
+        // Retries left for sending a scan request.
+        // Each retry will occur after 15s.
+        int scan_retries_left = 4;
+        // Retries left for resending the PReq frame is wrong ACK is received.
+        // Each retry will occur after 15s.
+        int ack_retries_left = 4;
+
+        // How much data we need to stuff inside PReq frames.
+        int len_data_to_stuff = strlen(data_to_stuff);
+        // How much data we have already stufed inside PReq frames.
+        int len_data_already_stuffed = 0;
+        /*
+         * We can stuff max 1452 bytes of IEs in a PReq frame.
+         *
+         * Each IE can be max 256 bytes out of which 3 bytes are for
+         * OUI (Organizationally Unique Identifier), 1 byte for vendor specific type,
+         * and 252 bytes for data.
+         *
+         * IEs will be structured inside a PReq packet as follows:
+         *
+         * IE0 Data: Seq. Number | Timestamp | More Fragment Bit
+         * IE1...N Data: Data
+         *
+         * We will reserve 9 bytes for Seq. Number, 19 bytes for Timestamp, and
+         * 2 bytes for More Fragment Bit, i.e. a total of 4 (reserved) + 9 + 19 + 2 = 34 bytes.
+         *
+         * So, the actual IEs (IE1...N) that contain the stuffed data can be 1452 - 34 = 1418 bytes.
+         * So, we need a min of floor(1418 / 256) + 1 = 6 IEs.
+         *
+         * So, the actual bytes availabe to stuff data = 1418 - (6 * 4) = 1394 bytes.
+         */
+        int ies_max_data_size = 1394;
+
+        // Current Timestamp (in ms). This will be same for all the PReq frames.
+        struct timeval data_origin_tv;
+        gettimeofday(&data_origin_tv, NULL);
+        unsigned int data_origin_ts = (data_origin_tv.tv_sec);
+        unsigned int data_origin_ts_usec = (data_origin_tv.tv_usec);
+        char data_origin_ts_str[20];
+        sprintf(data_origin_ts_str, "%012u%06u", data_origin_ts, data_origin_ts_usec);
+        printf("Timestamp (in ms): %s\n", data_origin_ts_str);
+        printf("\n======================================\n");
+
+        // Continue untill we have no more data to stuff.
+        while (len_data_already_stuffed < len_data_to_stuff) {
         char *data;
         int data_size;
         // Index in our 'data_to_stuff' string from where we will start stuffing.
@@ -263,7 +271,7 @@ int main(int argc, char **argv) {
 
                 if (ret < 0) {  // Didn't receive an ACK.
                     printf("ERROR: nl_recvmsgs_default() returned %d (%s).\n", ret, nl_geterror(-ret));
-                    log_info(wifi_interface, data_origin_ts, data_origin_ts_usec, data_origin_ts_str, data_tx_ts, 
+                    log_info(wifi_interface, data_origin_ts, data_origin_ts_usec, data_origin_ts_str, data_tx_ts,
                              data_tx_ts_usec, data_size, 5 - ack_retries_left, -1);
 
                     // Retry only if it is guaranteed delivery effort.
@@ -289,13 +297,13 @@ int main(int argc, char **argv) {
                     printf("Received ACK: %d\n", ack_seq_num);
                     // Invalid ACK. Retry.
                     if (ack_seq_num == -1 || ack_seq_num != seq_num) {
-                        log_info(wifi_interface, data_origin_ts, data_origin_ts_usec, data_origin_ts_str, 
+                        log_info(wifi_interface, data_origin_ts, data_origin_ts_usec, data_origin_ts_str,
                             data_tx_ts, data_tx_ts_usec, data_size, 5 - ack_retries_left, -1);
                         // Retry only if it is guaranteed delivery effort.
                         if (effort == 2) {
                             ack_retries_left--;
                             printf("Invalid received ACK.\n");
-                            
+
                             if (ack_retries_left > 0) {
                                 nl_socket_free(socket);
                                 // Wait for 15 seconds before sending new scan request.
@@ -311,7 +319,7 @@ int main(int argc, char **argv) {
                             break;
                         }
                     } else {  // Everything went well. Scan and ACK flow completed.
-                        log_info(wifi_interface, data_origin_ts, data_origin_ts_usec, data_origin_ts_str, 
+                        log_info(wifi_interface, data_origin_ts, data_origin_ts_usec, data_origin_ts_str,
                             data_tx_ts, data_tx_ts_usec, data_size, 5 - ack_retries_left, 1);
                         printf("ACK received successfully.\n\nWaiting for 15s before sending more data.");
                         fflush(stdout);
@@ -342,5 +350,7 @@ int main(int argc, char **argv) {
         printf("\n");
     }
 
+        free(data_to_stuff);
+    }
     return 0;
 }
